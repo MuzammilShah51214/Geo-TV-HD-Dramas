@@ -752,6 +752,7 @@
 
 <script>
     // YouTube DRAMA DATA WITH PLAYLIST IDs
+// YouTube DRAMA DATA WITH PLAYLIST IDs
 const dramas = [
     {
         title: "KUFFARA",
@@ -1044,7 +1045,34 @@ function onPlayerReady(event) {
     }
 }
 
-// UPDATED: Better handling for ads and video
+// Helper function to detect if ad is playing
+function isAdPlaying() {
+    if (!player || !player.getVideoData) return false;
+    
+    try {
+        const videoData = player.getVideoData();
+        const title = videoData.title || '';
+        const author = videoData.author || '';
+        const duration = player.getDuration ? player.getDuration() : 0;
+        
+        // Check common ad indicators
+        if (title === '' || 
+            title.toLowerCase().includes('advertisement') || 
+            title.toLowerCase().includes('ad') ||
+            title.toLowerCase().includes('advert') ||
+            author.toLowerCase().includes('google') ||
+            duration <= 90) { // Ads are usually short (90 seconds or less)
+            return true;
+        }
+        
+        return false;
+    } catch (error) {
+        console.log("Error checking ad status:", error);
+        return false;
+    }
+}
+
+// UPDATED: Ads چلتے ہی poster ہائیڈ ہو جائے
 function onPlayerStateChange(event) {
     const loader = document.getElementById('bufferingScreen');
     const playIcon = document.getElementById('playIcon');
@@ -1061,33 +1089,41 @@ function onPlayerStateChange(event) {
     // 3: BUFFERING
     // 5: VIDEO_CUED
     
-    // جب کوئی content (video ya ad) چل رہا ہو
+    // جب کوئی content چل رہا ہو (ads ya video)
     if (event.data === YT.PlayerState.PLAYING) {
         loader.style.display = 'none';
         ytWrapper.classList.add('active');
         playIcon.innerText = '||';
         
-        // Drama image کو ہمیشہ چھپائیں جب content چل رہا ہو
-        if (dramaImage) {
+        // 🔥 IMPORTANT: Ads چلنے پر poster ہائیڈ ہو جائے
+        if (dramaImage && isAdPlaying()) {
+            dramaImage.classList.add('hidden');
+        }
+        // Video چلنے پر بھی poster ہائیڈ ہو
+        else if (dramaImage) {
             dramaImage.classList.add('hidden');
         }
     }
-    // صرف جب video buffer ہو رہی ہو تو loader دکھائیں
+    // Buffer ہو رہا ہو
     else if (event.data === YT.PlayerState.BUFFERING) {
         // Ads buffer ہو رہی ہوں تو loader نہ دکھائیں
         if (isAdPlaying()) {
             loader.style.display = 'none';
+            // Ads buffer ہو رہی ہوں تب بھی poster ہائیڈ رہے
+            if (dramaImage) {
+                dramaImage.classList.add('hidden');
+            }
         } else {
             loader.style.display = 'flex';
         }
-        // Drama image کو hidden نہ کریں buffer ہوتے وقت
     }
-    // باقی تمام حالتوں میں loader ہائیڈ کریں
+    // باقی تمام حالتوں میں
     else {
         loader.style.display = 'none';
         
         if (event.data === YT.PlayerState.PAUSED) {
             playIcon.innerText = '▶';
+            // Pause پر poster دوبارہ دکھائیں
             if (dramaImage) {
                 dramaImage.classList.remove('hidden');
             }
@@ -1099,40 +1135,17 @@ function onPlayerStateChange(event) {
                     openPlayer(currentUserEpisodeIndex + 1);
                 }, 2000);
             }
+            // Ended پر poster دکھائیں
             if (dramaImage) {
                 dramaImage.classList.remove('hidden');
             }
         }
         else if (event.data === YT.PlayerState.CUED || event.data === -1) {
+            // CUED ya UNSTARTED پر poster دکھائیں
             if (dramaImage) {
                 dramaImage.classList.remove('hidden');
             }
         }
-    }
-}
-
-// Helper function to detect if ad is playing
-function isAdPlaying() {
-    if (!player || !player.getVideoData) return false;
-    
-    try {
-        const videoData = player.getVideoData();
-        const title = videoData.title || '';
-        const author = videoData.author || '';
-        
-        // Check common ad indicators
-        if (title === '' || 
-            title.toLowerCase().includes('advertisement') || 
-            title.toLowerCase().includes('ad') ||
-            author.toLowerCase().includes('google') ||
-            player.getDuration() <= 60) { // Ads are usually short
-            return true;
-        }
-        
-        return false;
-    } catch (error) {
-        console.log("Error checking ad status:", error);
-        return false;
     }
 }
 
