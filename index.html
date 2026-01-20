@@ -752,6 +752,7 @@
 
 <script>
     // YouTube DRAMA DATA WITH PLAYLIST IDs
+// YouTube DRAMA DATA WITH PLAYLIST IDs
 const dramas = [
     {
         title: "KUFFARA",
@@ -790,6 +791,8 @@ let playerReady = false;
 let currentPage = 'dramas'; // 'dramas' or 'episodes'
 let isShowingAd = false;
 let videoStartedPlaying = false;
+let currentVideoDuration = 0;
+let lastPlayerState = -1;
 
 // Browser Back Button Handler
 function setupBrowserBackButton() {
@@ -1035,6 +1038,7 @@ function onPlayerReady(event) {
     playerReady = true;
     videoStartedPlaying = false;
     isShowingAd = false;
+    currentVideoDuration = 0;
 }
 
 function onPlayerStateChange(event) {
@@ -1043,6 +1047,8 @@ function onPlayerStateChange(event) {
     const ytWrapper = document.getElementById('ytWrapper');
     
     if (!loader || !playIcon || !ytWrapper) return;
+    
+    lastPlayerState = event.data;
     
     // YouTube Player States:
     // -1: UNSTARTED
@@ -1055,26 +1061,33 @@ function onPlayerStateChange(event) {
     if (event.data === YT.PlayerState.PLAYING) {
         videoStartedPlaying = true;
         
-        // Check if this is an ad (ads usually have different duration patterns)
+        // Try to get video duration to check if it's an ad
         try {
             const duration = player.getDuration();
+            currentVideoDuration = duration;
             
-            // If duration is less than 5 minutes and not the main video, it might be an ad
-            if (duration < 300 && duration > 0) {
+            // AD DETECTION LOGIC:
+            // Ads are usually short (5-90 seconds) and main videos are longer
+            // Also check if this is the first PLAYING state after loading
+            if (duration > 0 && duration < 90) {
                 isShowingAd = true;
-                console.log("Ad detected - hiding loader");
+                console.log("Ad detected - Duration:", duration, "seconds");
+                
+                // Hide loader immediately when ad starts playing
                 loader.style.display = 'none';
                 ytWrapper.classList.add('active');
                 playIcon.innerText = '||';
             } else {
                 // Main video playing
                 isShowingAd = false;
+                console.log("Main video playing - Duration:", duration, "seconds");
                 loader.style.display = 'none';
                 ytWrapper.classList.add('active');
                 playIcon.innerText = '||';
             }
         } catch (error) {
             // Fallback if we can't get duration
+            console.log("Error getting duration:", error);
             isShowingAd = false;
             loader.style.display = 'none';
             ytWrapper.classList.add('active');
@@ -1082,27 +1095,49 @@ function onPlayerStateChange(event) {
         }
     }
     else if (event.data === YT.PlayerState.BUFFERING) {
-        // Only show loader if video hasn't started playing OR if it's not an ad
-        if (!videoStartedPlaying || !isShowingAd) {
+        // BUFFERING during ad - hide loader
+        if (isShowingAd) {
+            loader.style.display = 'none';
+            ytWrapper.classList.add('active');
+        } 
+        // BUFFERING before video starts or during main video - show loader
+        else if (!videoStartedPlaying) {
             loader.style.display = 'flex';
-        } else {
+            ytWrapper.classList.remove('active');
+        }
+        // BUFFERING during main video - hide loader
+        else {
             loader.style.display = 'none';
         }
     }
     else if (event.data === YT.PlayerState.PAUSED) {
         playIcon.innerText = '▶';
-        loader.style.display = 'none';
+        // Only show loader if main video is paused and not an ad
+        if (!isShowingAd) {
+            loader.style.display = 'flex';
+            ytWrapper.classList.remove('active');
+        }
     }
     else if (event.data === YT.PlayerState.ENDED) {
-        isShowingAd = false;
-        videoStartedPlaying = false;
-        loader.style.display = 'none';
-        
-        const drama = dramas[currentDramaIndex];
-        if (currentUserEpisodeIndex < drama.episodeCount - 1) {
-            setTimeout(() => {
-                openPlayer(currentUserEpisodeIndex + 1);
-            }, 2000);
+        // If an ad ended, reset ad flag
+        if (isShowingAd) {
+            isShowingAd = false;
+            console.log("Ad ended");
+            // When ad ends, the main video should start
+            // Show loader for main video
+            loader.style.display = 'flex';
+            ytWrapper.classList.remove('active');
+        } else {
+            // Main video ended
+            videoStartedPlaying = false;
+            loader.style.display = 'none';
+            
+            const drama = dramas[currentDramaIndex];
+            if (currentUserEpisodeIndex < drama.episodeCount - 1) {
+                setTimeout(() => {
+                    openPlayer(currentUserEpisodeIndex + 1);
+                }, 2000);
+            }
         }
     }
     else if (event.data === YT.PlayerState.CUED || event.data === -1) {
@@ -1110,6 +1145,7 @@ function onPlayerStateChange(event) {
         isShowingAd = false;
         videoStartedPlaying = false;
         loader.style.display = 'flex';
+        ytWrapper.classList.remove('active');
     }
 }
 
@@ -1174,6 +1210,7 @@ function openPlayer(userEpisodeIndex) {
     // Reset states
     isShowingAd = false;
     videoStartedPlaying = false;
+    currentVideoDuration = 0;
     
     // Show loading initially
     if (bufferingScreen) {
@@ -1214,6 +1251,7 @@ function openPlayer(userEpisodeIndex) {
 // Skip function with loading animation
 function skipWithLoading(seconds) {
     const bufferingScreen = document.getElementById('bufferingScreen');
+    // Only show loading if not during an ad
     if (bufferingScreen && !isShowingAd) {
         bufferingScreen.style.display = 'flex';
         
