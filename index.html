@@ -389,7 +389,7 @@
             margin-bottom: 5px;
         }
 
-        .yt-iframe-wrapper {
+.yt-iframe-wrapper {
             position: absolute; 
             top: -50px;
             left: 0; 
@@ -715,6 +715,7 @@
         </div>
     </footer>
 
+
 <script>
     // YouTube DRAMA DATA WITH PLAYLIST IDs
     const dramas = [
@@ -753,6 +754,7 @@
     let youtubeAPILoaded = false;
     let playerReady = false;
     let currentPage = 'dramas'; // 'dramas' or 'episodes'
+    let lastPlayerState = -1;
 
     // Browser Back Button Handler
     function setupBrowserBackButton() {
@@ -963,7 +965,7 @@
                 height: '100%',
                 width: '100%',
                 playerVars: {
-                    'autoplay': 1, // CHANGED TO 1 FOR AUTOPLAY
+                    'autoplay': 1, // ✅ Ads فوراً start ہوں گے
                     'controls': 0,
                     'disablekb': 1,
                     'enablejsapi': 1,
@@ -977,7 +979,7 @@
                     'hl': 'en',
                     'widget_referrer': window.location.hostname,
                     'origin': window.location.origin,
-                    'autohide': 0 // CHANGED TO 0 - لا ads کو hide کرے
+                    'autohide': 0 // ✅ Ads کبھی بھی hide نہیں ہوں گے
                 },
                 events: {
                     'onReady': onPlayerReady,
@@ -996,9 +998,21 @@
     function onPlayerReady(event) {
         console.log("Player is ready");
         playerReady = true;
+        
+        // Hide loader when player is ready
+        const loader = document.getElementById('bufferingScreen');
+        if (loader) {
+            loader.style.display = 'none';
+        }
+        
+        // Show YouTube player
+        const ytWrapper = document.getElementById('ytWrapper');
+        if (ytWrapper) {
+            ytWrapper.classList.add('active');
+        }
     }
 
-    // FIXED ON STATE CHANGE FOR ADS
+    // FIXED ON STATE CHANGE FOR ADS - NO LOADER OVERLAY
     function onPlayerStateChange(event) {
         const loader = document.getElementById('bufferingScreen');
         const playIcon = document.getElementById('playIcon');
@@ -1006,8 +1020,12 @@
         
         if (!loader || !playIcon || !ytWrapper) return;
         
+        lastPlayerState = event.data;
+        
+        console.log("Player State:", event.data);
+        
         // YouTube Player States:
-        // -1: UNSTARTED (ads بھی یہاں ہوتے ہیں)
+        // -1: UNSTARTED (ads start ہوتے ہیں)
         // 0: ENDED
         // 1: PLAYING
         // 2: PAUSED
@@ -1015,25 +1033,30 @@
         // 5: VIDEO_CUED
         
         if (event.data === YT.PlayerState.PLAYING) {
-            // چاہے ad ہو یا video، playing state میں player کو active کریں
+            // ✅ Ads یا video دونوں کے لیے - NO LOADER
             loader.style.display = 'none';
             ytWrapper.classList.add('active');
             playIcon.innerText = '||';
         }
         else if (event.data === YT.PlayerState.BUFFERING) {
-            // BUFFERING میں loader دکھائیں
+            // ✅ صرف 1 second کے لیے loader دکھائیں
             loader.style.display = 'flex';
-            ytWrapper.classList.remove('active');
+            
+            // 1 second بعد loader ہٹائیں (ads کے لیے)
+            setTimeout(() => {
+                if (loader && lastPlayerState === YT.PlayerState.BUFFERING) {
+                    loader.style.display = 'none';
+                    ytWrapper.classList.add('active');
+                }
+            }, 1000);
         }
         else if (event.data === YT.PlayerState.PAUSED) {
             playIcon.innerText = '▶';
-            // Paused state میں بھی player active رہے
+            // NO LOADER on pause
             loader.style.display = 'none';
         }
         else if (event.data === YT.PlayerState.ENDED) {
-            loader.style.display = 'flex';
-            ytWrapper.classList.remove('active');
-            
+            // Video ended - next episode
             const drama = dramas[currentDramaIndex];
             if (currentUserEpisodeIndex < drama.episodeCount - 1) {
                 setTimeout(() => {
@@ -1042,10 +1065,9 @@
             }
         }
         else if (event.data === YT.PlayerState.CUED || event.data === -1) {
-            // UNSTARTED یا CUED state (ads شروع ہونے سے پہلے)
-            // یہاں loader دکھائیں مگر player کو active رہنے دیں
-            loader.style.display = 'flex';
-            // ytWrapper کو active رہنے دیں تاکہ ads نظر آئیں
+            // Video cued یا UNSTARTED - NO LOADER
+            loader.style.display = 'none';
+            ytWrapper.classList.add('active');
         }
     }
 
@@ -1054,6 +1076,12 @@
         const loader = document.getElementById('bufferingScreen');
         if (loader) {
             loader.style.display = 'none';
+        }
+        
+        // Show YouTube player even on error
+        const ytWrapper = document.getElementById('ytWrapper');
+        if (ytWrapper) {
+            ytWrapper.classList.add('active');
         }
     }
 
@@ -1104,13 +1132,20 @@
         const bufferingScreen = document.getElementById('bufferingScreen');
         const ytWrapper = document.getElementById('ytWrapper');
         
-        // Show loading initially
+        // ✅ IMPORTANT: Show loader for only 2 seconds
         if (bufferingScreen) {
             bufferingScreen.style.display = 'flex';
+            
+            // Auto hide loader after 2 seconds
+            setTimeout(() => {
+                if (bufferingScreen) {
+                    bufferingScreen.style.display = 'none';
+                }
+            }, 2000);
         }
         
         if (ytWrapper) {
-            ytWrapper.classList.remove('active');
+            ytWrapper.classList.add('active');
         }
         
         if (player && player.loadPlaylist) {
