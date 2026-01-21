@@ -889,13 +889,11 @@ body.player-open .main-content {
     let currentUserEpisodeIndex = 0;
     let hideTimeout;
     let currentPlaylistId = '';
-    let youtubeAPILoaded = false;
     let playerReady = false;
     let currentPage = 'dramas';
     let isAdPlaying = false;
     let posterVisible = true;
 
-    // Browser Back Button Logic
     function setupBrowserBackButton() {
         window.addEventListener('popstate', function() {
             if (currentPage === 'episodes') goBackToDramas();
@@ -919,11 +917,7 @@ body.player-open .main-content {
         document.getElementById('fixedBackButton').style.display = 'none';
         dramaGrid.style.display = 'grid';
         document.body.classList.remove('player-open');
-
-        if (player) {
-            try { player.destroy(); player = null; } catch (e) { console.log(e); }
-        }
-
+        if (player) { try { player.destroy(); player = null; } catch (e) {} }
         isAdPlaying = false;
         posterVisible = true;
 
@@ -989,9 +983,10 @@ body.player-open .main-content {
             </div>
         `;
 
-        const episodesContainer = document.getElementById('episodesContainer');
-        episodesContainer.innerHTML = `<div class="episodes-grid" id="episodesGrid"></div>`;
-        const episodesGrid = document.getElementById('episodesGrid');
+        const episodesGrid = document.createElement('div');
+        episodesGrid.className = 'episodes-grid';
+        document.getElementById('episodesContainer').appendChild(episodesGrid);
+        
         for (let i = 0; i < drama.episodeCount; i++) {
             const btn = document.createElement('button');
             btn.className = 'episode-button';
@@ -1025,6 +1020,20 @@ body.player-open .main-content {
                 'onStateChange': onPlayerStateChange 
             }
         });
+        
+        // ✅ NEW: Continuous check for loader removal
+        setInterval(() => {
+            if (player && typeof player.getPlayerState === 'function') {
+                const state = player.getPlayerState();
+                const loader = document.getElementById('bufferingScreen');
+                // Agar video play ho rahi hai (even ads), loader ko hamesha hide rakhein
+                if (state === YT.PlayerState.PLAYING && loader && loader.style.display !== 'none') {
+                    loader.style.display = 'none';
+                    console.log("Force Hiding Loader");
+                }
+            }
+        }, 500);
+
         setInterval(updateProgress, 500);
     }
 
@@ -1033,37 +1042,29 @@ body.player-open .main-content {
         document.getElementById('bufferingScreen').style.display = 'none';
     }
 
-    // ✅ CLICK LOGIC: Image and Loader Fix
     function openPlayer(userEpisodeIndex) {
         if (!player || !playerReady) return;
-
         const drama = dramas[currentDramaIndex];
         currentUserEpisodeIndex = userEpisodeIndex;
         let playlistIndex = drama.reverseOrder ? (drama.episodeCount - 1 - userEpisodeIndex) : userEpisodeIndex;
 
+        // ✅ Immediate Hide Image & Show Loader
         const dramaImage = document.getElementById('dramaPlayerImage');
         const loader = document.getElementById('bufferingScreen');
+        if (dramaImage) dramaImage.style.display = 'none';
+        if (loader) loader.style.display = 'flex';
+        posterVisible = false;
 
-        // 1. Episode click karte hi Image aur Loader (dono) manage karein
-        if (dramaImage) {
-            dramaImage.style.display = 'none';
-            posterVisible = false;
-        }
-        if (loader) loader.style.display = 'flex'; // Pehle loader dikhayein
-
-        // 2. Load Video
         player.loadPlaylist({
             list: currentPlaylistId,
             listType: 'playlist',
             index: playlistIndex
         });
 
-        // Highlight Active Button
         document.querySelectorAll('.episode-button').forEach(el => el.classList.remove('active'));
         document.getElementById(`ep-button-${userEpisodeIndex}`)?.classList.add('active');
     }
 
-    // ✅ STATE CHANGE LOGIC: Ads ke waqt loader aur image ko hatana
     function onPlayerStateChange(event) {
         const loader = document.getElementById('bufferingScreen');
         const dramaImage = document.getElementById('dramaPlayerImage');
@@ -1074,12 +1075,9 @@ body.player-open .main-content {
         isAdPlaying = (videoData && (videoData.ad === 1 || videoData.title === "Advertisement" || videoData.isPlayable === false));
 
         if (event.data === YT.PlayerState.PLAYING) {
-            // ✅ Ad ho ya Video, Loading aur Image ko foran hide kar dein
+            // ✅ Hide everything when video starts
             if (loader) loader.style.display = 'none';
-            if (dramaImage) {
-                dramaImage.style.display = 'none';
-                posterVisible = false;
-            }
+            if (dramaImage) dramaImage.style.display = 'none';
             if (playIcon) playIcon.innerText = '||';
 
             if (isAdPlaying) {
@@ -1091,17 +1089,12 @@ body.player-open .main-content {
                 resetHideTimer();
             }
         } 
-        
         else if (event.data === YT.PlayerState.BUFFERING) {
-            // Agar ad nahi chal raha tabhi loader dikhayein
             if (!isAdPlaying && loader) loader.style.display = 'flex';
         }
-
         else if (event.data === YT.PlayerState.PAUSED) {
             if (playIcon) playIcon.innerText = '▶';
-            if (loader) loader.style.display = 'none'; // Pause par loader kabhi na dikhayein
-            
-            // Pause par image tabhi dikhayein agar ad NA chal raha ho
+            if (loader) loader.style.display = 'none';
             if (!isAdPlaying && dramaImage) {
                 dramaImage.style.display = 'block';
                 posterVisible = true;
@@ -1122,8 +1115,10 @@ body.player-open .main-content {
     function handleUIInteraction() {
         if (isAdPlaying) return;
         const playerArea = document.getElementById('playerArea');
-        playerArea.classList.toggle('show-ui');
-        if (playerArea.classList.contains('show-ui')) resetHideTimer();
+        if (playerArea) {
+            playerArea.classList.toggle('show-ui');
+            if (playerArea.classList.contains('show-ui')) resetHideTimer();
+        }
     }
 
     function playPause() {
