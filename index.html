@@ -807,9 +807,7 @@
         </div>
     </footer>
 
-    // Replace the entire JavaScript section with this updated version
-
-<script>
+ <script>
     // YouTube DRAMA DATA
     const dramas = [
         {
@@ -846,7 +844,8 @@
     let playerReady = false;
     let currentPage = 'dramas';
     let isAdPlaying = false;
-    let controlsVisible = true; // Track controls visibility state
+    let controlsVisible = true;
+    let loadingInterval = null;
 
     // Browser back button setup
     function setupBrowserBackButton() {
@@ -862,6 +861,94 @@
         
         history.replaceState({ page: 'dramas' }, '', '#');
         return pushHistoryState;
+    }
+
+    // Show loading animation
+    function showLoading() {
+        const playerArea = document.getElementById('playerArea');
+        if (!playerArea) return;
+        
+        // Remove existing loading if present
+        hideLoading();
+        
+        // Create loading overlay
+        const loadingOverlay = document.createElement('div');
+        loadingOverlay.id = 'loadingOverlay';
+        loadingOverlay.style.cssText = `
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            backdrop-filter: blur(3px);
+        `;
+        
+        // Create loading spinner
+        const spinner = document.createElement('div');
+        spinner.style.cssText = `
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--pink);
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        `;
+        
+        // Create loading text
+        const loadingText = document.createElement('div');
+        loadingText.style.cssText = `
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            letter-spacing: 1px;
+            background: linear-gradient(90deg, var(--pink), var(--neon-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        `;
+        loadingText.textContent = 'Loading...';
+        
+        // Add CSS animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        `;
+        
+        loadingOverlay.appendChild(style);
+        loadingOverlay.appendChild(spinner);
+        loadingOverlay.appendChild(loadingText);
+        
+        playerArea.appendChild(loadingOverlay);
+        
+        // Add dots animation to text
+        let dots = 0;
+        loadingInterval = setInterval(() => {
+            dots = (dots + 1) % 4;
+            loadingText.textContent = 'Loading' + '.'.repeat(dots);
+        }, 500);
+    }
+
+    // Hide loading animation
+    function hideLoading() {
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        if (loadingOverlay) {
+            loadingOverlay.remove();
+        }
+        if (loadingInterval) {
+            clearInterval(loadingInterval);
+            loadingInterval = null;
+        }
     }
 
     // Render dramas list
@@ -886,7 +973,8 @@
         }
         
         isAdPlaying = false;
-        controlsVisible = true; // Reset controls visibility
+        controlsVisible = true;
+        hideLoading();
 
         dramaList.forEach((drama, index) => {
             const dramaCard = document.createElement('div');
@@ -917,7 +1005,8 @@
         document.getElementById('dramaGrid').style.display = 'none';
         document.getElementById('fixedBackButton').style.display = 'flex';
         document.body.classList.add('player-open');
-        controlsVisible = true; // Make controls visible when player opens
+        controlsVisible = true;
+        hideLoading();
 
         const playerContainer = document.getElementById('playerContainer');
         playerContainer.innerHTML = `
@@ -992,7 +1081,7 @@
             const tag = document.createElement('script');
             tag.src = "https://www.youtube.com/iframe_api";
             document.head.appendChild(tag);
-            window.onYouTubeIframeAPIReady = () => initializePlayer();
+            window.onYouTubeIframeAPIReady = initializePlayer;
         }
     }
 
@@ -1011,18 +1100,18 @@
             width: '100%',
             playerVars: { 
                 'autoplay': 0, 
-                'controls': 0,           // YouTube کنٹرولز کو ہائیڈ کریں
+                'controls': 0,
                 'modestbranding': 1, 
                 'rel': 0, 
                 'playsinline': 1, 
                 'enablejsapi': 1,
-                'fs': 0,                 // YouTube fullscreen button ہائیڈ
-                'showinfo': 0,           // معلومات ہائیڈ
-                'iv_load_policy': 3,     // annotations ہائیڈ
-                'disablekb': 1,          // کی بورڈ کنٹرولز ڈس ایبل
-                'autohide': 2,           // کنٹرولز آٹو ہائیڈ
-                'cc_load_policy': 0,     // سب ٹائٹلز ہائیڈ
-                'widget_referrer': 1,    // ریفرر معلومات ہائیڈ
+                'fs': 0,
+                'showinfo': 0,
+                'iv_load_policy': 3,
+                'disablekb': 1,
+                'autohide': 2,
+                'cc_load_policy': 0,
+                'widget_referrer': 1,
             },
             events: { 
                 'onReady': onPlayerReady, 
@@ -1057,6 +1146,9 @@
         currentUserEpisodeIndex = userEpisodeIndex;
         let playlistIndex = drama.reverseOrder ? (drama.episodeCount - 1 - userEpisodeIndex) : userEpisodeIndex;
 
+        // Show loading animation
+        showLoading();
+        
         // Episode click karte hi Image foran hide hogi
         const dramaImage = document.getElementById('dramaPlayerImage');
         if (dramaImage) dramaImage.style.display = 'none';
@@ -1085,6 +1177,9 @@
         isAdPlaying = (videoData && (videoData.ad === 1 || videoData.title === "Advertisement" || videoData.isPlayable === false));
 
         if (event.data === YT.PlayerState.PLAYING) {
+            // Hide loading when video or ad starts playing
+            hideLoading();
+            
             // Image hide rakhein jab video ya ad chal raha ho
             if (dramaImage) dramaImage.style.display = 'none';
             if (playIcon) playIcon.innerText = '||';
@@ -1114,12 +1209,25 @@
             clearTimeout(hideTimeout);
         }
         else if (event.data === YT.PlayerState.ENDED) {
+            // Hide loading if still showing
+            hideLoading();
+            
             if (dramaImage) dramaImage.style.display = 'block';
             if (playIcon) playIcon.innerText = '▶';
             
             // Video ختم ہونے پر controls دکھائیں
             showControls();
             clearTimeout(hideTimeout);
+        }
+        else if (event.data === YT.PlayerState.BUFFERING) {
+            // Show loading when buffering
+            if (!isAdPlaying && player.getPlayerState() !== YT.PlayerState.PLAYING) {
+                showLoading();
+            }
+        }
+        else if (event.data === YT.PlayerState.CUED) {
+            // Hide loading when video is cued
+            hideLoading();
         }
     }
 
@@ -1130,7 +1238,7 @@
             if (!isAdPlaying && player && player.getPlayerState() === YT.PlayerState.PLAYING) {
                 hideControls();
             }
-        }, 5000); // Hide after 5 seconds
+        }, 5000);
     }
 
     // Show controls
@@ -1288,14 +1396,21 @@
             player = null; 
         }
         
+        hideLoading();
         renderDramas(dramas);
         window.scrollTo({top: 0, behavior: 'smooth'});
     }
 
     // Initialize on page load
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize back button functionality
         window.pushHistoryState = setupBrowserBackButton();
+        
+        // Render dramas on page load
         renderDramas(dramas);
+        
+        // Setup scroll to top button
+        document.querySelector('.scroll-top-btn').onclick = () => window.scrollTo({top: 0, behavior: 'smooth'});
     });
 </script>
 </body>
