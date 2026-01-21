@@ -894,8 +894,6 @@ body.player-open .main-content {
     let playerReady = false;
     let currentPage = 'dramas';
     let isAdPlaying = false;
-    let adTimer = null;
-    let videoDuration = 0;
     let posterVisible = true;
 
     // Browser Back Button Handler
@@ -918,7 +916,6 @@ body.player-open .main-content {
         return pushHistoryState;
     }
 
-    // Function to render drama cards
     function renderDramas(dramaList) {
         currentPage = 'dramas';
         const dramaGrid = document.getElementById('dramaGrid');
@@ -934,44 +931,32 @@ body.player-open .main-content {
             try {
                 player.destroy();
                 player = null;
-            } catch (e) {
-                console.log("Error destroying player:", e);
-            }
+            } catch (e) { console.log(e); }
         }
 
-        // Reset states
         isAdPlaying = false;
-        if (adTimer) clearTimeout(adTimer);
         posterVisible = true;
 
         dramaList.forEach((drama, index) => {
             const dramaCard = document.createElement('div');
             dramaCard.className = 'drama-card';
-            dramaCard.id = `drama-${index}`;
             dramaCard.innerHTML = `
                 <div class="drama-image-container">
                     <img src="${drama.image}" alt="${drama.title}" class="drama-image">
-                    <div class="image-overlay">
-                        <div class="watch-text">Watch ${drama.episodeCount} Episodes</div>
-                    </div>
+                    <div class="image-overlay"><div class="watch-text">Watch ${drama.episodeCount} Episodes</div></div>
                 </div>
                 <div class="drama-info">
                     <div class="drama-title">${drama.title}</div>
                     <div class="drama-year">${drama.category} • ${drama.episodeCount} Episodes</div>
                 </div>
             `;
-            dramaCard.onclick = () => {
-                openDramaEpisodes(index);
-            };
+            dramaCard.onclick = () => openDramaEpisodes(index);
             dramaGrid.appendChild(dramaCard);
         });
 
-        if (window.pushHistoryState) {
-            window.pushHistoryState();
-        }
+        if (window.pushHistoryState) window.pushHistoryState();
     }
 
-    // Function to open episodes for a specific drama with player
     function openDramaEpisodes(dramaIndex) {
         currentPage = 'episodes';
         currentDramaIndex = dramaIndex;
@@ -981,57 +966,32 @@ body.player-open .main-content {
         document.getElementById('fixedBackButton').style.display = 'flex';
         document.body.classList.add('player-open');
 
-        // Create player WITH DRAMA IMAGE AS OVERLAY
         const playerContainer = document.getElementById('playerContainer');
         playerContainer.innerHTML = `
             <div class="player-box" id="playerBox" style="display: block;">
                 <div class="player-content" id="playerArea" onclick="handleUIInteraction()">
-                    <!-- YouTube Player - BACKGROUND میں -->
                     <div class="yt-iframe-wrapper" id="ytWrapper">
                         <div id="youtube-player"></div>
                     </div>
-                    
-                    <!-- DRAMA IMAGE AS OVERLAY - YouTube کے اوپر -->
                     <img src="${drama.image}" class="drama-player-image" id="dramaPlayerImage" style="display: block;">
-                    
-                    <!-- Loading Screen -->
                     <div id="bufferingScreen">
                         <div class="neon-loader"></div>
                         <div class="loading-text">LOADING...</div>
                     </div>
-                    
                     <div class="center-controls">
-                        <button class="skip-btn" onclick="skip(-10); event.stopPropagation();">
-                            <span>↺</span>10s
-                        </button>
-                        <button class="skip-btn" onclick="skip(10); event.stopPropagation();">
-                            <span>↻</span>10s
-                        </button>
+                        <button class="skip-btn" onclick="skip(-10); event.stopPropagation();"><span>↺</span>10s</button>
+                        <button class="skip-btn" onclick="skip(10); event.stopPropagation();"><span>↻</span>10s</button>
                     </div>
-                    
-                    <div style="position:absolute; inset:0; z-index:5;" id="touchLayer"></div>
-                    
                     <div class="bottom-ui" onclick="event.stopPropagation()">
-                        <div class="p-bar" onclick="seek(event)">
-                            <div class="p-buffer" id="pBuffer"></div>
-                            <div class="p-fill" id="pFill"></div>
-                        </div>
+                        <div class="p-bar" onclick="seek(event)"><div class="p-fill" id="pFill"></div></div>
                         <div class="controls-container">
                             <div class="left-controls">
-                                <button class="control-btn prev-btn" onclick="prevEp()">⏮</button>
+                                <button class="control-btn" onclick="prevEp()">⏮</button>
                                 <button class="control-btn play-pause-btn" onclick="playPause()" id="playIcon">▶</button>
-                                <button class="control-btn next-btn" onclick="nextEp()">⏭</button>
-                                <div class="time-display">
-                                    <span id="currTime">0:00</span> / <span id="totalTime">0:00</span>
-                                </div>
+                                <button class="control-btn" onclick="nextEp()">⏭</button>
+                                <div class="time-display"><span id="currTime">0:00</span> / <span id="totalTime">0:00</span></div>
                             </div>
                             <div class="right-controls">
-                                <div class="volume-control">
-                                    <button class="control-btn volume-btn" onclick="toggleMute()">🔊</button>
-                                    <div class="volume-slider" onclick="adjustVolume(event)">
-                                        <div class="volume-fill" id="volumeFill"></div>
-                                    </div>
-                                </div>
                                 <button class="fullscreen-btn" onclick="toggleFullscreen()">⛶</button>
                             </div>
                         </div>
@@ -1040,601 +1000,199 @@ body.player-open .main-content {
             </div>
         `;
 
-        // Show drama info
-        const dramaInfoContainer = document.getElementById('dramaInfoContainer');
-        dramaInfoContainer.innerHTML = `
-            <div class="drama-info-below">
-                <h2>${drama.title}</h2>
-                <p>${drama.category} • ${drama.episodeCount} Episodes</p>
-            </div>
-        `;
-
-        // Create episodes buttons
         const episodesContainer = document.getElementById('episodesContainer');
-        episodesContainer.innerHTML = `
-            <div class="episodes-grid" id="episodesGrid"></div>
-        `;
+        episodesContainer.innerHTML = `<div class="episodes-grid" id="episodesGrid"></div>`;
         const episodesGrid = document.getElementById('episodesGrid');
         for (let i = 0; i < drama.episodeCount; i++) {
-            const episodeNumber = i + 1;
             const btn = document.createElement('button');
             btn.className = 'episode-button';
             btn.id = `ep-button-${i}`;
-            btn.innerHTML = `Episode ${episodeNumber}`;
-            btn.onclick = (e) => {
-                e.stopPropagation();
-                openPlayer(i);
-            };
+            btn.innerHTML = `Episode ${i + 1}`;
+            btn.onclick = (e) => { e.stopPropagation(); openPlayer(i); };
             episodesGrid.appendChild(btn);
         }
 
-        setTimeout(() => {
-            if (typeof YT !== 'undefined' && YT.Player) {
-                initializePlayer();
-            } else {
-                if (!youtubeAPILoaded) {
-                    loadYouTubeAPI();
-                }
-            }
-        }, 500);
-
-        window.scrollTo({top: 0, behavior: 'smooth'});
-        if (window.pushHistoryState) {
-            window.pushHistoryState();
-        }
+        loadYouTubeAPI();
     }
 
-    // Load YouTube API
     function loadYouTubeAPI() {
         if (window.YT && window.YT.Player) {
-            youtubeAPILoaded = true;
             initializePlayer();
-            return;
+        } else {
+            const tag = document.createElement('script');
+            tag.src = "https://www.youtube.com/iframe_api";
+            document.head.appendChild(tag);
+            window.onYouTubeIframeAPIReady = () => initializePlayer();
         }
-
-        const tag = document.createElement('script');
-        tag.src = "https://www.youtube.com/iframe_api";
-        const firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
-        window.onYouTubeIframeAPIReady = function() {
-            youtubeAPILoaded = true;
-            initializePlayer();
-        };
     }
 
-    // Initialize YouTube Player
     function initializePlayer() {
-        if (player) {
-            try {
-                player.destroy();
-            } catch (e) {
-                console.log("Error destroying previous player:", e);
+        if (player) player.destroy();
+        player = new YT.Player('youtube-player', {
+            height: '100%', width: '100%',
+            playerVars: { 'autoplay': 0, 'controls': 0, 'modestbranding': 1, 'rel': 0, 'playsinline': 1 },
+            events: { 
+                'onReady': onPlayerReady, 
+                'onStateChange': onPlayerStateChange 
             }
-        }
-
-        if (!document.getElementById('youtube-player')) {
-            console.log("YouTube player element not found");
-            return;
-        }
-
-        try {
-            player = new YT.Player('youtube-player', {
-                height: '100%',
-                width: '100%',
-                playerVars: {
-                    'autoplay': 0,
-                    'controls': 0,
-                    'disablekb': 1,
-                    'enablejsapi': 1,
-                    'fs': 1,
-                    'modestbranding': 1,
-                    'rel': 0,
-                    'playsinline': 1,
-                    'iv_load_policy': 3,
-                    'showinfo': 0,
-                    'cc_load_policy': 0,
-                    'hl': 'en',
-                    'widget_referrer': window.location.hostname,
-                    'origin': window.location.origin,
-                    'autohide': 0,
-                    'color': 'white',
-                    'branding': 0,
-                    'start': 0,
-                    'end': 0,
-                    'playsinline': 1,
-                    'cc_load_policy': 0,
-                    'disablekb': 1,
-                    'enablejsapi': 1,
-                    'origin': window.location.origin,
-                    'widgetid': 1,
-                    'wmode': 'transparent'
-                },
-                events: {
-                    'onReady': onPlayerReady,
-                    'onStateChange': onPlayerStateChange,
-                    'onError': onPlayerError
-                }
-            });
-            setInterval(updateProgress, 500);
-        } catch (error) {
-            console.log("Error initializing YouTube player:", error);
-        }
+        });
+        setInterval(updateProgress, 500);
     }
 
     function onPlayerReady(event) {
-        console.log("YouTube Player is ready");
         playerReady = true;
-
-        // Hide loader
-        const loader = document.getElementById('bufferingScreen');
-        if (loader) {
-            loader.style.display = 'none';
-        }
-
-        // Show YouTube player
-        const ytWrapper = document.getElementById('ytWrapper');
-        if (ytWrapper) {
-            ytWrapper.classList.add('active');
-        }
-
-        // Poster کو show رکھیں
-        const dramaImage = document.getElementById('dramaPlayerImage');
-        if (dramaImage) {
-            dramaImage.style.display = 'block';
-            posterVisible = true;
-        }
-
-        // Force show UI initially
-        const playerArea = document.getElementById('playerArea');
-        if (playerArea) {
-            playerArea.classList.add('show-ui');
-            playerArea.classList.remove('hide-controls');
-        }
+        document.getElementById('bufferingScreen').style.display = 'none';
     }
 
-    // Function to open player when episode button is clicked
+    // ✅ FIXED: Episode button click par image foran hide hogi
     function openPlayer(userEpisodeIndex) {
-        if (!player || !playerReady) {
-            console.log("Player not initialized or not ready");
-            return;
-        }
+        if (!player || !playerReady) return;
 
         const drama = dramas[currentDramaIndex];
         currentUserEpisodeIndex = userEpisodeIndex;
-        let youtubePlaylistIndex;
-        if (drama.reverseOrder) {
-            youtubePlaylistIndex = drama.episodeCount - 1 - userEpisodeIndex;
-        } else {
-            youtubePlaylistIndex = userEpisodeIndex;
-        }
+        let playlistIndex = drama.reverseOrder ? (drama.episodeCount - 1 - userEpisodeIndex) : userEpisodeIndex;
 
-        // Highlight active episode button
-        document.querySelectorAll('.episode-button').forEach(el => el.classList.remove('active'));
-        const episodeButton = document.getElementById(`ep-button-${userEpisodeIndex}`);
-        if (episodeButton) {
-            episodeButton.classList.add('active');
-        }
-
-        const bufferingScreen = document.getElementById('bufferingScreen');
-        const ytWrapper = document.getElementById('ytWrapper');
-        const playerArea = document.getElementById('playerArea');
         const dramaImage = document.getElementById('dramaPlayerImage');
+        const loader = document.getElementById('bufferingScreen');
 
-        // ✅ فوراً ڈراما امیج ہائیڈ کر دیں
+        // 1. Sabse pehle image ko hide karein taake ads dikhen
         if (dramaImage) {
             dramaImage.style.display = 'none';
             posterVisible = false;
         }
 
-        // Show loader
-        if (bufferingScreen) {
-            bufferingScreen.style.display = 'flex';
-        }
+        // 2. Loader dikhayein
+        if (loader) loader.style.display = 'flex';
 
-        if (ytWrapper) {
-            ytWrapper.classList.add('active');
-        }
+        // 3. Highlight button
+        document.querySelectorAll('.episode-button').forEach(el => el.classList.remove('active'));
+        document.getElementById(`ep-button-${userEpisodeIndex}`)?.classList.add('active');
 
-        // Show UI immediately
-        if (playerArea) {
-            playerArea.classList.add('show-ui');
-            playerArea.classList.remove('hide-controls');
-            // Clear any existing hide timer
-            if (hideTimeout) clearTimeout(hideTimeout);
-            // اشتہارات کے دوران کنٹرولز کو ہائیڈ نہ ہونے دیں
-            playerArea.setAttribute('data-ad-playing', 'false');
-        }
-
-        if (player && player.loadPlaylist) {
-            try {
-                player.loadPlaylist({
-                    list: currentPlaylistId,
-                    listType: 'playlist',
-                    index: youtubePlaylistIndex
-                });
-            } catch (error) {
-                console.log("Error loading playlist:", error);
-            }
-        } else {
-            console.log("Player loadPlaylist not available");
-        }
+        // 4. Load Video
+        player.loadPlaylist({
+            list: currentPlaylistId,
+            listType: 'playlist',
+            index: playlistIndex
+        });
     }
 
-    // Modified onStateChange - Handle ads and video states
     function onPlayerStateChange(event) {
         const loader = document.getElementById('bufferingScreen');
-        const playIcon = document.getElementById('playIcon');
-        const ytWrapper = document.getElementById('ytWrapper');
-        const playerArea = document.getElementById('playerArea');
         const dramaImage = document.getElementById('dramaPlayerImage');
+        const playIcon = document.getElementById('playIcon');
+        const playerArea = document.getElementById('playerArea');
 
-        if (!loader || !playIcon || !ytWrapper || !playerArea) return;
+        // Check for Ads
+        let videoData = player.getVideoData();
+        isAdPlaying = (videoData && (videoData.ad === 1 || videoData.title === "Advertisement" || videoData.isPlayable === false));
 
-        console.log("Player State:", event.data);
-
-        // YouTube Player States:
         if (event.data === YT.PlayerState.PLAYING) {
-            // Video started playing
-            loader.style.display = 'none';
-            ytWrapper.classList.add('active');
-            playIcon.innerText = '||';
-
-            // اگر poster visible ہے تو hide کریں
-            if (dramaImage && posterVisible) {
+            if (loader) loader.style.display = 'none';
+            if (playIcon) playIcon.innerText = '||';
+            
+            // ✅ Playing state mein image hamesha hide rahegi
+            if (dramaImage) {
                 dramaImage.style.display = 'none';
                 posterVisible = false;
             }
 
-            // چیک کریں کہ اشتہار چل رہا ہے یا نہیں
-            if (player) {
-                try {
-                    const videoData = player.getVideoData();
-                    // اگر اشتہار چل رہا ہے
-                    if (videoData.isPlayable === false || 
-                        videoData.title === "Advertisement" || 
-                        videoData.title.includes("Ad") ||
-                        videoData.video_id === "") {
-                        
-                        isAdPlaying = true;
-                        playerArea.setAttribute('data-ad-playing', 'true');
-                        console.log("Advertisement detected");
-                        
-                        // اشتہار کے دوران کنٹرولز چھپنے نہ دیں
-                        clearTimeout(hideTimeout);
-                        playerArea.classList.add('show-ui');
-                        playerArea.classList.remove('hide-controls');
-                        
-                        // اشتہار کا دورانیہ چیک کریں
-                        setTimeout(() => {
-                            isAdPlaying = false;
-                            playerArea.setAttribute('data-ad-playing', 'false');
-                            console.log("Advertisement finished");
-                            // اشتہار ختم ہونے پر ہائیڈ ٹائمر دوبارہ شروع کریں
-                            resetHideTimer();
-                        }, 30000);
-                        
-                    } else {
-                        // نارمل ویڈیو
-                        isAdPlaying = false;
-                        playerArea.setAttribute('data-ad-playing', 'false');
-                        resetHideTimer();
-                    }
-                } catch (error) {
-                    console.log("Error checking ad status:", error);
-                    resetHideTimer();
-                }
-            }
-            
-        } else if (event.data === YT.PlayerState.BUFFERING) {
-            // Buffering - show loader
-            loader.style.display = 'flex';
-            
-            // اگر poster hidden ہے تو show کریں (صرف نارمل ویڈیو کے لیے)
-            if (dramaImage && !posterVisible && !isAdPlaying) {
-                dramaImage.style.display = 'block';
-                posterVisible = true;
-            }
-            
-        } else if (event.data === YT.PlayerState.PAUSED) {
-            playIcon.innerText = '▶';
-            loader.style.display = 'none';
-            
-            // اشتہار کے دوران نہیں تو ہی پوسٹر دکھائیں
-            if (!isAdPlaying) {
-                if (dramaImage && !posterVisible) {
-                    dramaImage.style.display = 'block';
-                    posterVisible = true;
-                }
-            }
-            
-        } else if (event.data === YT.PlayerState.ENDED) {
-            // Video ended
-            isAdPlaying = false;
-            playerArea.setAttribute('data-ad-playing', 'false');
-            
-            if (dramaImage && !posterVisible) {
-                dramaImage.style.display = 'block';
-                posterVisible = true;
-            }
-            
-            const drama = dramas[currentDramaIndex];
-            if (currentUserEpisodeIndex < drama.episodeCount - 1) {
-                setTimeout(() => {
-                    openPlayer(currentUserEpisodeIndex + 1);
-                }, 2000);
-            }
-            
-        } else if (event.data === YT.PlayerState.CUED || event.data === -1) {
-            // Video cued یا UNSTARTED
-            loader.style.display = 'none';
-            ytWrapper.classList.add('active');
-            
-            // Poster show کریں صرف اگر اشتہار نہیں چل رہا
-            if (!isAdPlaying) {
-                if (dramaImage && !posterVisible) {
-                    dramaImage.style.display = 'block';
-                    posterVisible = true;
-                }
-            }
-        }
-    }
-
-    function onPlayerError(event) {
-        console.log("Player error:", event.data);
-        const loader = document.getElementById('bufferingScreen');
-        if (loader) {
-            loader.style.display = 'none';
-        }
-        // Show poster on error
-        const dramaImage = document.getElementById('dramaPlayerImage');
-        if (dramaImage && !posterVisible) {
-            dramaImage.style.display = 'block';
-            posterVisible = true;
-        }
-    }
-
-    // Skip function
-    function skip(seconds) {
-        if (player && player.getCurrentTime) {
-            try {
-                let currentTime = player.getCurrentTime();
-                player.seekTo(currentTime + seconds, true);
+            if (isAdPlaying) {
+                playerArea.setAttribute('data-ad-playing', 'true');
+                playerArea.classList.add('show-ui');
+                clearTimeout(hideTimeout);
+            } else {
+                playerArea.setAttribute('data-ad-playing', 'false');
                 resetHideTimer();
-            } catch (error) {
-                console.log("Error skipping:", error);
+            }
+        } 
+        
+        else if (event.data === YT.PlayerState.PAUSED) {
+            if (playIcon) playIcon.innerText = '▶';
+            // Pause par image tabhi dikhayein agar ad NA chal raha ho
+            if (!isAdPlaying && dramaImage) {
+                dramaImage.style.display = 'block';
+                posterVisible = true;
             }
         }
-    }
 
-    // Modified handleUIInteraction function
-    function handleUIInteraction() {
-        const playerArea = document.getElementById('playerArea');
-        if (!playerArea) return;
-
-        // اشتہار کے دوران تو کنٹرولز ہائیڈ ہی نہ ہوں
-        const isAdPlaying = playerArea.getAttribute('data-ad-playing') === 'true';
-        if (isAdPlaying) {
-            playerArea.classList.add('show-ui');
-            playerArea.classList.remove('hide-controls');
-            return;
-        }
-
-        clearTimeout(hideTimeout);
-        if (playerArea.classList.contains('hide-controls') || !playerArea.classList.contains('show-ui')) {
-            playerArea.classList.remove('hide-controls');
-            playerArea.classList.add('show-ui');
-            hideTimeout = setTimeout(() => {
-                playerArea.classList.remove('show-ui');
-                playerArea.classList.add('hide-controls');
-            }, 3000);
-        } else {
-            playerArea.classList.remove('show-ui');
-            playerArea.classList.add('hide-controls');
+        else if (event.data === YT.PlayerState.BUFFERING) {
+            if (loader) loader.style.display = 'flex';
+            // Buffering ke waqt image ko mat dikhayein agar naya episode load ho raha ho
         }
     }
 
-    // Modified resetHideTimer function
     function resetHideTimer() {
         const playerArea = document.getElementById('playerArea');
-        if (!playerArea) return;
-
-        // اشتہار کے دوران ہائیڈ ٹائمر نہ چلائیں
-        const isAdPlaying = playerArea.getAttribute('data-ad-playing') === 'true';
-        if (isAdPlaying) {
-            playerArea.classList.add('show-ui');
-            playerArea.classList.remove('hide-controls');
-            return;
-        }
-
+        if (!playerArea || isAdPlaying) return;
         clearTimeout(hideTimeout);
-        playerArea.classList.remove('hide-controls');
         playerArea.classList.add('show-ui');
         hideTimeout = setTimeout(() => {
-            playerArea.classList.remove('show-ui');
-            playerArea.classList.add('hide-controls');
+            if (!isAdPlaying) playerArea.classList.remove('show-ui');
         }, 3000);
     }
 
-    function playPause() {
+    function handleUIInteraction() {
         const playerArea = document.getElementById('playerArea');
-        if (playerArea) {
-            const isAdPlaying = playerArea.getAttribute('data-ad-playing') === 'true';
-            if (isAdPlaying) {
-                // اشتہار کے دوران پلی/پاز نہ کرنے دیں
-                return;
-            }
-        }
+        if (isAdPlaying) return;
+        playerArea.classList.toggle('show-ui');
+        if (playerArea.classList.contains('show-ui')) resetHideTimer();
+    }
 
-        if (player) {
-            try {
-                if (player.getPlayerState() === YT.PlayerState.PLAYING) {
-                    player.pauseVideo();
-                } else {
-                    player.playVideo();
-                }
-                resetHideTimer();
-            } catch (error) {
-                console.log("Error play/pause:", error);
-            }
-        }
+    function playPause() {
+        if (isAdPlaying) return;
+        const state = player.getPlayerState();
+        state === YT.PlayerState.PLAYING ? player.pauseVideo() : player.playVideo();
+    }
+
+    function skip(seconds) {
+        if (isAdPlaying) return;
+        player.seekTo(player.getCurrentTime() + seconds, true);
     }
 
     function updateProgress() {
-        if (player && player.getCurrentTime && player.getDuration) {
-            try {
-                const curr = player.getCurrentTime();
-                const dur = player.getDuration();
-                const pFill = document.getElementById('pFill');
-                const currTime = document.getElementById('currTime');
-                const totalTime = document.getElementById('totalTime');
-                if (dur > 0 && pFill && currTime && totalTime) {
-                    pFill.style.width = (curr/dur*100) + '%';
-                    currTime.innerText = formatTime(curr);
-                    totalTime.innerText = formatTime(dur);
-                }
-            } catch (error) {
-                console.log("Error updating progress:", error);
+        if (player && player.getCurrentTime && !isAdPlaying) {
+            const curr = player.getCurrentTime();
+            const dur = player.getDuration();
+            const pFill = document.getElementById('pFill');
+            if (dur > 0 && pFill) {
+                pFill.style.width = (curr / dur * 100) + '%';
+                document.getElementById('currTime').innerText = formatTime(curr);
+                document.getElementById('totalTime').innerText = formatTime(dur);
             }
         }
     }
 
-    function formatTime(seconds) {
-        const minutes = Math.floor(seconds / 60);
-        const secs = Math.floor(seconds % 60);
-        return minutes + ":" + (secs < 10 ? '0' : '') + secs;
+    function formatTime(s) {
+        const m = Math.floor(s / 60);
+        const r = Math.floor(s % 60);
+        return m + ":" + (r < 10 ? '0' : '') + r;
     }
 
-    // Modified seek function
-    function seek(e) {
-        const playerArea = document.getElementById('playerArea');
-        if (playerArea) {
-            const isAdPlaying = playerArea.getAttribute('data-ad-playing') === 'true';
-            if (isAdPlaying) {
-                return; // اشتہار کے دوران seek نہ کرنے دیں
-            }
-        }
-
-        if (player && player.getDuration) {
-            try {
-                const rect = e.currentTarget.getBoundingClientRect();
-                const duration = player.getDuration();
-                const seekTo = ((e.clientX - rect.left) / rect.width) * duration;
-                player.seekTo(seekTo, true);
-                resetHideTimer();
-            } catch (error) {
-                console.log("Error seeking:", error);
-            }
-        }
+    function toggleFullscreen() {
+        const el = document.getElementById('playerArea');
+        if (!document.fullscreenElement) el.requestFullscreen();
+        else document.exitFullscreen();
     }
 
     function nextEp() {
         const drama = dramas[currentDramaIndex];
-        if (currentUserEpisodeIndex < drama.episodeCount - 1) {
-            openPlayer(currentUserEpisodeIndex + 1);
-        }
+        if (currentUserEpisodeIndex < drama.episodeCount - 1) openPlayer(currentUserEpisodeIndex + 1);
     }
 
     function prevEp() {
-        if (currentUserEpisodeIndex > 0) {
-            openPlayer(currentUserEpisodeIndex - 1);
-        }
+        if (currentUserEpisodeIndex > 0) openPlayer(currentUserEpisodeIndex - 1);
     }
 
-    function toggleFullscreen() {
-        const playerArea = document.getElementById('playerArea');
-        if (playerArea) {
-            if (!document.fullscreenElement) {
-                playerArea.requestFullscreen().catch(err => {
-                    console.log(`Error attempting to enable fullscreen: ${err.message}`);
-                });
-            } else {
-                document.exitFullscreen();
-            }
-            resetHideTimer();
-        }
-    }
-
-    // Function to go back to dramas list
     function goBackToDramas() {
-        if (player) {
-            try {
-                player.stopVideo();
-                player.destroy();
-            } catch (e) {
-                console.log("Error destroying player:", e);
-            }
-            player = null;
-        }
-
-        // Reset states
-        posterVisible = true;
+        if (player) { player.stopVideo(); player.destroy(); player = null; }
         renderDramas(dramas);
-
-        if (window.pushHistoryState) {
-            window.pushHistoryState();
-        }
-        window.scrollTo({top: 0, behavior: 'smooth'});
+        window.scrollTo(0,0);
     }
 
-    // Initialize the page
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', () => {
         window.pushHistoryState = setupBrowserBackButton();
-
-        if (typeof cordova !== 'undefined') {
-            document.addEventListener('backbutton', function() {
-                if (currentPage === 'episodes') {
-                    goBackToDramas();
-                } else {
-                    if (navigator.app) {
-                        navigator.app.exitApp();
-                    }
-                }
-            }, false);
-        }
-
         renderDramas(dramas);
-        loadYouTubeAPI();
-
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && currentPage === 'episodes') {
-                goBackToDramas();
-            }
-        });
     });
-
-    // Prevent right-click context menu on images
-    document.addEventListener('contextmenu', function(e) {
-        if (e.target.tagName === 'IMG') {
-            e.preventDefault();
-            return false;
-        }
-    });
-
-    // Prevent drag and drop of images
-    document.addEventListener('dragstart', function(e) {
-        if (e.target.tagName === 'IMG') {
-            e.preventDefault();
-            return false;
-        }
-    });
-
-    // Additional: Touch back gesture
-    let touchStartX = 0;
-    let touchStartY = 0;
-    document.addEventListener('touchstart', function(e) {
-        touchStartX = e.touches[0].clientX;
-        touchStartY = e.touches[0].clientY;
-    }, false);
-    document.addEventListener('touchend', function(e) {
-        const touchEndX = e.changedTouches[0].clientX;
-        const touchEndY = e.changedTouches[0].clientY;
-        const diffX = touchEndX - touchStartX;
-        const diffY = touchEndY - touchStartY;
-        if (Math.abs(diffY) < 50 && diffX > 100 && currentPage === 'episodes') {
-            goBackToDramas();
-        }
-    }, false);
 </script>
 </body>
 </html>
