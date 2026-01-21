@@ -846,6 +846,7 @@
     let isAdPlaying = false;
     let controlsVisible = true;
     let loadingInterval = null;
+    let wasPlayingBeforeAd = false;
 
     // Browser back button setup
     function setupBrowserBackButton() {
@@ -1146,6 +1147,15 @@
         currentUserEpisodeIndex = userEpisodeIndex;
         let playlistIndex = drama.reverseOrder ? (drama.episodeCount - 1 - userEpisodeIndex) : userEpisodeIndex;
 
+        // Stop current video if playing
+        if (player && player.getPlayerState) {
+            const currentState = player.getPlayerState();
+            if (currentState === YT.PlayerState.PLAYING || currentState === YT.PlayerState.BUFFERING) {
+                player.pauseVideo();
+                wasPlayingBeforeAd = true;
+            }
+        }
+        
         // Show loading animation
         showLoading();
         
@@ -1188,12 +1198,16 @@
                 // Ad کے دوران ہمیشہ controls دکھائیں
                 playerArea.setAttribute('data-ad-playing', 'true');
                 showControls();
+                // Track that ad started playing
+                wasPlayingBeforeAd = true;
             } else {
                 playerArea.setAttribute('data-ad-playing', 'false');
                 // Video playing - start auto-hide timer after 5 seconds
                 if (controlsVisible) {
                     startAutoHideTimer();
                 }
+                // If was playing before ad, reset the flag
+                wasPlayingBeforeAd = false;
             }
         } 
         else if (event.data === YT.PlayerState.PAUSED) {
@@ -1220,14 +1234,42 @@
             clearTimeout(hideTimeout);
         }
         else if (event.data === YT.PlayerState.BUFFERING) {
-            // Show loading when buffering
-            if (!isAdPlaying && player.getPlayerState() !== YT.PlayerState.PLAYING) {
+            // Check if it's buffering for an ad
+            if (isAdPlaying) {
+                // If it's an ad and buffering, hide loading
+                hideLoading();
+            } else if (player.getPlayerState() !== YT.PlayerState.PLAYING) {
+                // Only show loading if not already playing and not an ad
                 showLoading();
             }
         }
         else if (event.data === YT.PlayerState.CUED) {
             // Hide loading when video is cued
             hideLoading();
+        }
+        else if (event.data === YT.PlayerState.UNSTARTED) {
+            // Hide loading when video is unstarted (like after loading playlist)
+            hideLoading();
+        }
+        
+        // Check for ad detection periodically
+        checkForAd();
+    }
+
+    // Check for ad detection
+    function checkForAd() {
+        if (!player) return;
+        
+        const videoData = player.getVideoData();
+        const isCurrentlyAd = (videoData && (videoData.ad === 1 || videoData.title === "Advertisement" || videoData.isPlayable === false));
+        
+        if (isCurrentlyAd && !isAdPlaying) {
+            // Ad just started
+            isAdPlaying = true;
+            hideLoading(); // Hide loading when ad starts
+        } else if (!isCurrentlyAd && isAdPlaying) {
+            // Ad just ended
+            isAdPlaying = false;
         }
     }
 
