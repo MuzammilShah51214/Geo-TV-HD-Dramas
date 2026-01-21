@@ -255,6 +255,9 @@ body {
     background: #000;
     z-index: 1000;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.8);
+    /* نیچے والی لائن شامل کریں */
+    display: flex;
+    flex-direction: column;
 }
 
 .player-content { 
@@ -262,6 +265,9 @@ body {
     height: 100%;
     position: relative; 
     overflow: hidden; 
+    /* نیچے والی لائن شامل کریں */
+    display: flex;
+    flex-direction: column;
 }
 
 /* Main content margin when player is visible */
@@ -1648,9 +1654,12 @@ function openDramaEpisodes(dramaIndex) {
     hideLoading();
 
     const playerContainer = document.getElementById('playerContainer');
-    playerContainer.innerHTML = `
-        <div class="player-box" id="playerBox" style="display: block;">
-            <div class="player-content show-ui" id="playerArea">
+    // openDramaEpisodes function میں playerContainer.innerHTML کو یہ structure دیں:
+playerContainer.innerHTML = `
+    <div class="player-box" id="playerBox" style="display: block;">
+        <div class="player-content show-ui" id="playerArea">
+            <!-- Video Container - New div added -->
+            <div class="video-area" style="flex: 1; position: relative; overflow: hidden;">
                 <div class="yt-iframe-wrapper" id="ytWrapper">
                     <div id="youtube-player"></div>
                 </div>
@@ -1658,33 +1667,35 @@ function openDramaEpisodes(dramaIndex) {
                 
                 <!-- Touch Layer - Click to toggle controls -->
                 <div id="touchLayer" onclick="handleTouchLayerClick()"></div>
-                
-                <!-- Bottom Controls -->
-                <div class="bottom-ui" onclick="event.stopPropagation()">
-                    <div class="p-bar" onclick="seek(event)">
-                        <div class="p-fill" id="pFill"></div>
+            </div>
+            
+            <!-- Bottom Controls - This will stay at bottom -->
+            <div class="bottom-ui" onclick="event.stopPropagation()">
+                <div class="p-bar" onclick="seek(event)">
+                    <div class="p-fill" id="pFill"></div>
+                </div>
+                <div class="controls-container">
+                    <div class="left-controls">
+                        <button class="skip-btn" onclick="skip(-10); event.stopPropagation()">
+                            <span>↺</span>10s
+                        </button>
+                        <button class="control-btn play-pause-btn" onclick="handlePlayPauseClick(); event.stopPropagation()" id="playIcon">▶</button>
+                        <button class="skip-btn" onclick="skip(10); event.stopPropagation()">
+                            <span>↻</span>10s
+                        </button>
+                        <div class="time-display">
+                            <span id="currTime">0:00</span> / <span id="totalTime">0:00</span>
+                        </div>
                     </div>
-                    <div class="controls-container">
-                        <div class="left-controls">
-                            <button class="skip-btn" onclick="skip(-10); event.stopPropagation()">
-                                <span>↺</span>10s
-                            </button>
-                            <button class="control-btn play-pause-btn" onclick="handlePlayPauseClick(); event.stopPropagation()" id="playIcon">▶</button>
-                            <button class="skip-btn" onclick="skip(10); event.stopPropagation()">
-                                <span>↻</span>10s
-                            </button>
-                            <div class="time-display">
-                                <span id="currTime">0:00</span> / <span id="totalTime">0:00</span>
-                            </div>
-                        </div>
-                        <div class="right-controls">
-                            <button class="fullscreen-btn" onclick="toggleFullscreen(); event.stopPropagation()">⛶</button>
-                        </div>
+                    <div class="right-controls">
+                        <button class="fullscreen-btn" onclick="toggleFullscreen(); event.stopPropagation()">⛶</button>
                     </div>
                 </div>
             </div>
         </div>
-    `;
+    </div>
+`;
+    
 
     // Setup back button
     document.getElementById('fixedBackButton').onclick = goBackToDramas;
