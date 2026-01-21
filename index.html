@@ -63,7 +63,7 @@ body {
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     transition: all 0.3s ease;
     width: 100%;
-    aspect-ratio: 3/4;
+    aspect-ratio: 3/4; /* This ensures consistent card proportions */
     max-height: 280px;
     overflow: hidden;
 }
@@ -255,9 +255,6 @@ body {
     background: #000;
     z-index: 1000;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.8);
-    /* نیچے والی لائن شامل کریں */
-    display: flex;
-    flex-direction: column;
 }
 
 .player-content { 
@@ -265,9 +262,6 @@ body {
     height: 100%;
     position: relative; 
     overflow: hidden; 
-    /* نیچے والی لائن شامل کریں */
-    display: flex;
-    flex-direction: column;
 }
 
 /* Main content margin when player is visible */
@@ -297,7 +291,7 @@ body.player-open .main-content {
     width: 100%; 
     height: 100%; 
     z-index: 1;
-    pointer-events: none;
+    pointer-events: none; /* YouTube iframe کو کلیک ایونٹس سے block کریں */
 }
 
 .yt-iframe-wrapper.active { 
@@ -308,22 +302,24 @@ body.player-open .main-content {
     width: 100%; 
     height: 100%; 
     border: none; 
-    pointer-events: none;
+    pointer-events: none; /* YouTube player کلیکس کو block کریں */
 }
 
 /* TOUCH LAYER FOR BLOCKING YOUTUBE UI */
 #touchLayer {
     position: absolute;
-    inset: 0;
-    z-index: 10;
+    inset: 0; /* top, right, bottom, left all 0 */
+    z-index: 10; /* YouTube player سے اوپر */
     cursor: pointer;
-    background: transparent;
+    background: transparent; /* Transparent رہے */
 }
 
+/* جب UI show ہو تو touch layer کو disable کریں */
 .player-content.show-ui #touchLayer {
     pointer-events: none;
 }
 
+/* جب UI hide ہو تو touch layer enable کریں */
 .player-content:not(.show-ui) #touchLayer {
     pointer-events: auto;
 }
@@ -331,12 +327,12 @@ body.player-open .main-content {
 /* UI CONTROLS - FIXED WITH BLACK CONTAINER */
 .bottom-ui { 
     position: absolute; 
-    bottom: 20;
+    bottom: 20px;
     left: 0; 
     right: 0;
     background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, rgba(0,0,0,0) 100%);
     padding: 15px 15px 10px 15px; 
-    z-index: 15;
+    z-index: 15; /* Touch layer سے اوپر */
     opacity: 0;
     transition: opacity 0.3s ease;
     backdrop-filter: blur(5px);
@@ -614,80 +610,6 @@ footer {
     text-align: center;
 }
 
-/* ============ SEE MORE BUTTON STYLES ============ */
-/* See More Button Styles */
-.see-more-container {
-    text-align: center;
-    margin: 40px 0 20px;
-    width: 100%;
-    grid-column: 1 / -1;
-}
-
-.see-more-btn {
-    background: linear-gradient(45deg, var(--primary), var(--pink));
-    color: white;
-    border: none;
-    padding: 15px 40px;
-    font-size: 18px;
-    font-weight: bold;
-    border-radius: 25px;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(139, 0, 0, 0.5);
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    margin: 20px auto;
-    min-width: 200px;
-}
-
-.see-more-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(139, 0, 0, 0.7);
-    background: linear-gradient(45deg, var(--pink), var(--primary));
-}
-
-.see-more-btn:active {
-    transform: translateY(-1px);
-}
-
-.see-more-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-}
-
-.see-more-btn.loading {
-    position: relative;
-    color: transparent;
-}
-
-.see-more-btn.loading::after {
-    content: "";
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    border: 3px solid rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    border-top-color: white;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-/* Drama Count Display */
-.drama-count {
-    color: var(--secondary);
-    font-size: 14px;
-    text-align: center;
-    margin-top: 10px;
-    opacity: 0.8;
-}
-/* ============ END SEE MORE STYLES ============ */
-
 /* Responsive Design */
 @media (max-width: 768px) {
     .drama-grid {
@@ -770,17 +692,6 @@ footer {
         font-size: 13px;
     }
     
-    /* See More Button Responsive */
-    .see-more-btn {
-        padding: 12px 30px;
-        font-size: 16px;
-        min-width: 180px;
-    }
-    
-    .drama-count {
-        font-size: 13px;
-    }
-    
     :root {
         --player-fixed-height: 290px;
     }
@@ -850,22 +761,6 @@ footer {
         font-size: 12px;
     }
     
-    /* See More Button Responsive */
-    .see-more-btn {
-        padding: 10px 25px;
-        font-size: 15px;
-        min-width: 160px;
-    }
-    
-    .see-more-container {
-        margin: 30px 0 15px;
-    }
-    
-    .drama-count {
-        font-size: 12px;
-        margin-top: 8px;
-    }
-    
     .footer-links {
         gap: 10px;
         font-size: 14px;
@@ -903,13 +798,6 @@ footer {
         min-height: 140px;
     }
     
-    /* See More Button Desktop */
-    .see-more-btn {
-        padding: 16px 45px;
-        font-size: 19px;
-        min-width: 220px;
-    }
-    
     :root {
         --player-fixed-height: 340px;
     }
@@ -941,19 +829,7 @@ footer {
     .drama-year {
         font-size: 0.65rem;
     }
-    
-    /* See More Button Extra Small */
-    .see-more-btn {
-        padding: 8px 20px;
-        font-size: 14px;
-        min-width: 140px;
-    }
-    
-    .see-more-container {
-        margin: 25px 0 10px;
-    }
 }
-
     </style>
 </head>
 <body>
@@ -1004,1102 +880,631 @@ footer {
                 category: "Romantic Comedy",
                 reverseOrder: false
             },
-            {
-                title: "AAFAT",
-                image: "https://i.ytimg.com/vi/NwxLXyBzKJg/mqdefault.jpg",
-                playlistId: 'PLdZNFVCDo_1cwI--XKu2tRTkgQ5XSK-eM',
-                episodeCount: 80,
-                category: "",
-                reverseOrder: false
-            },
             
-         {
-      title: "TERE BIN",
-      image: "https://i.ytimg.com/vi/wykbxHM2Ch4/hq720.jpg",
-      playlistId: 'PLdZNFVCDo_1fAo1couOKo4E_uVD7luqpG',
-      episodeCount: 58,
-      category: "Love Story",
-      reverseOrder: true
-  },
-  {
-      title: "SUN MERE DIL",
-      image: "https://i.ytimg.com/vi/nIOy8P92V-c/hq720.jpg",
-      playlistId: 'PLMUbnkiRAF_ztD-yRpnKISPXRKuwsnUFV',
-      episodeCount: 40,
-      category: "Geo TV Serial",
-      reverseOrder: false 
-  },
-  {
-      title: "HAYA",
-      image: "https://i.ytimg.com/vi/aTGFD4UCmv8/hq720.jpg",
-      playlistId: 'PLdZNFVCDo_1feYCo-h9n6W_U4UZCaLaNQ',
-      episodeCount: 56,
-      category: "Geo TV Serial",
-      reverseOrder: true 
-  },
-  {
-      title: "PATHAR DIL",
-      image: "https://i.ytimg.com/vi/o2IAYQQZuOA/hq720.jpg",
-      playlistId: 'PLdZNFVCDo_1egwg7eBjzG3nSLf7tmBrQJ',
-      episodeCount: 101,
-      category: "Geo Tv Serial",
-      reverseOrder: true
-  },
-  {
-      title: "JAAN NISAAR",
-      image: "https://i.ytimg.com/vi/0TbObX0dyQQ/hq720.jpg",
-      playlistId: 'PLdZNFVCDo_1eocwT31h8jUUJvSpsZjZhy',
-      episodeCount: 65,
-      category: "Thriller",
-      reverseOrder: false
-  },
-  {
-      title: "Aik Aur Pakeezah",
-      image: "https://i.ytimg.com/vi/_kOOCEOE5t4/hq720.jpg", 
-      playlistId: 'PLdZNFVCDo_1cXP8j7KtS47mLbYQVKJigw',
-      episodeCount: 2,
-      category: "Geo Tv Serial",
-      reverseOrder: true
-  },
-  {
-      title: "IBLEES",
-      image: "https://i.ytimg.com/vi/dId3G_PoJN8/hq720.jpg",
-      playlistId: 'PLdZNFVCDo_1fdskSQ17JlM4pgd6nKZAMI',
-      episodeCount: 9,
-      category: "Geo Tv Serial",
-      reverseOrder: true
-  },
-  {
-      title: "Pehli Barish",
-      image: "https://i.ytimg.com/vi/V3NwPivixXg/hq720.jpg",
-      playlistId: 'PLdZNFVCDo_1eIghtdb1aZBpEusJnM9WyD',
-      episodeCount: 6,
-      category: "Geo Tv Serial",
-      reverseOrder: true
-  },
-  {
-      title: "Mafaad Parast",
-      image: "https://i.ytimg.com/vi/XwsIcZW47q8/hq720.jpg",
-      playlistId: 'PLdZNFVCDo_1dMWBEhsBTV-IFoKRHYi-pe',
-      episodeCount: 45,
-      category: "Geo Tv Serial",
-      reverseOrder: true
-  },
-  {
-      title: "Shikanja",
-      image: "https://i.ytimg.com/vi/OOKZR7L_QQo/hq720.jpg",
-      playlistId: 'PLdZNFVCDo_1eGwKvpx3_-X0T7V0yAphkC',
-      episodeCount: 59,
-      category: "Geo Tv Serial",
-      reverseOrder: true
-  },
-  {
-      title: "Ab Dekh Khuda Kya Karta Hai 2025",
-      image: "https://i.ytimg.com/vi/X86J65DMA08/hq720.jpg",
-      playlistId: 'PLdZNFVCDo_1ek3FN75Ia9y_ffTryiFoOb',
-      episodeCount: 24,
-      category: "Geo Tv Serial",
-      reverseOrder: true
-  },
-  {
-      title: "Khuda Aur Mohabbat",
-      image: "https://i.ytimg.com/vi/HgYo8_Ek3yA/hq720.jpg",
-      playlistId: 'PLdZNFVCDo_1dlhOBHn6cSklC_NiecY_Ka',
-      episodeCount: 23,
-      category: "Geo Tv Serial",
-      reverseOrder: true
-  },
-  
-  
-{
-      title: "Khuda Aur Mohabbat",
-      image: "https://i.ytimg.com/vi/zvXxQoLpZqQ/mqdefault.jpg",
-      playlistId: 'PL4Xd7Q60SXjIeU9VJ_FLQk54GQOvEnptD',
-      episodeCount: 39,
-      category: "Geo Tv Serial",
-      reverseOrder: false
-  },  
-  
-  
-  
-  {
-      title: "Sanwal Yaar Piya",
-      image: "https://i.ytimg.com/vi/ImyGQHkaxlg/hq720.jpg",
-      playlistId: 'PLdZNFVCDo_1cCiRaIwU7QQ0sj78B0miQV',
-      episodeCount: 36,
-      category: "Geo Tv Serial",
-      reverseOrder: true
-  },
-  {
-      title: "Bahar Nagar",
-      image: "https://i.ytimg.com/vi/YAK_k0xqs_0/hq720.jpg",
-      playlistId: 'PLdZNFVCDo_1efaJk5o1Zbi79vBSwyzEuU',
-      episodeCount: 117,
-      category: "Geo Tv Serial",
-      reverseOrder: true
-  },
-  {
-      title: "Kaarzar-e-Dua",
-      image: "https://i.ytimg.com/vi/Tjlrjs8_7h8/hq720.jpg",
-      playlistId: 'PLdZNFVCDo_1cs1ZJ6c4Co94alwoFgb-B0',
-      episodeCount: 16,
-      category: "Geo Tv Serial",
-      reverseOrder: true
-  },
-  {
-      title: "Haji Bayram Veli",
-      image: "https://i.ytimg.com/vi/wKDItEbWA0E/hq720.jpg",
-      playlistId: 'PLdZNFVCDo_1eB-lVyTasZTZTQVuunSpws',
-      episodeCount: 59,
-      category: "Geo Tv Serial",
-      reverseOrder: true
-  },
-  {
-      title: "Mohra",
-      image: "https://i.ytimg.com/vi/XhF4wD-saA0/hq720.jpg",
-      playlistId: 'PLdZNFVCDo_1daWAT33c0NkjZHEEtDxarY',
-      episodeCount: 76,
-      category: "Geo Tv Serial",
-      reverseOrder: true
-  },
-  {
-      title: "Baray Bhaiya",
-      image: "https://i.ytimg.com/vi/sg7RPWC84U4/hq720.jpg",
-      playlistId: 'PLdZNFVCDo_1dVGwuOR7dyhL1rGgN2waE4',
-      episodeCount: 90,
-      category: "Geo Tv Serial",
-      reverseOrder: false
-  },
-  {
-      title: "AIK LUFZ ZINDAGI",
-      image: "https://i.ytimg.com/vi/YhZ1Z5fk2xw/hq720.jpg",
-      playlistId: 'PLdZNFVCDo_1fwf8xsFjWAlwXaQQDHjSwy',
-      episodeCount: 85,
-      category: "Geo Tv Serial",
-      reverseOrder: false
-  },
-  {
-      title: "Humraaz",
-      image: "https://i.ytimg.com/vi/cXVMiNXiWCs/hq720.jpg",
-      playlistId: 'PLdZNFVCDo_1eUQ8d1R3-puI0YgaQh5Icv',
-      episodeCount: 37,
-      category: "Geo Tv Serial",
-      reverseOrder: false
-  },
-  {
-      title: "Behkaway",
-      image: "https://i.ytimg.com/vi/DceZJhTxQU8/hq720.jpg",
-      playlistId: 'PLdZNFVCDo_1dRNenXivH-lmB3i0WFaW5N',
-      episodeCount: 60,
-      category: "Geo Tv Serial",
-      reverseOrder: false
-  },
-  {
-      title: "Katputi",
-      image: "https://i.ytimg.com/vi/y5X-4SFAugs/mqdefault.jpg",
-      playlistId: 'PLdZNFVCDo_1dHgVp9LLjNTQH3nbCKV2ig',
-      episodeCount: 114,
-      category: "Geo Tv Serial",
-      reverseOrder: false
-  },
-  {
-      title: "Umme AYESHA",
-      image: "https://i.ytimg.com/vi/p90uOJUdno4/mqdefault.jpg",
-      playlistId: 'PLdZNFVCDo_1fbyTV0rfKFS7GOuoJmRKxb',
-      episodeCount: 0,
-      category: "Geo Tv Serial",
-      reverseOrder: false
-  },
-  {
-      title: "Dayen",
-      image: "https://i.ytimg.com/vi/EKZvhkVsa8o/mqdefault.jpg",
-      playlistId: 'PLdZNFVCDo_1egEMTIHT4pl8uPq2Wyef_P',
-      episodeCount: 58,
-      category: "Geo Tv Serial",
-      reverseOrder: false
-  },
-  {
-      title: "Man Mast Malang",
-      image: "https://i.ytimg.com/vi/8yslaApEuH4/mqdefault.jpg",
-      playlistId: 'PLdZNFVCDo_1fTLEzoy2KPER3pvFw4QFxY',
-      episodeCount: 56,
-      category: "Geo Tv Serial",
-      reverseOrder: false
-  },
-  {
-      title: "Man Marzi",
-      image: "https://i.ytimg.com/vi/0J-S8n6rpA4/mqdefault.jpg",
-      playlistId: "PLdZNFVCDo_1dnauxAP6iow9NkoV_RWly6",
-      episodeCount: 97,
-      category: "Geo Tv Serial",
-      reverseOrder: false
-  },
-  {
-      title: "Bajjo",
-      image: "https://i.ytimg.com/vi/6BKby6cFJw0/mqdefault.jpg",
-      playlistId: "PLdZNFVCDo_1e8TIw4_NvMgrE-ahyNbJfm",
-      episodeCount: 102,
-      category: "Geo Tv Serial",
-      reverseOrder: false
-  },
-  {
-      title: "Guddi",
-      image: "https://i.ytimg.com/vi/EUssQ5Txx5I/mqdefault.jpg",
-      playlistId: "PLdZNFVCDo_1fUghKpVZSldZrUHynHXrrf",
-      episodeCount: 116,
-      category: "Geo Tv Serial",
-      reverseOrder: false
-  },
-  {
-      title: "Mahshar",
-      image: "https://i.ytimg.com/vi/nNFftitdHT4/mqdefault.jpg",
-      playlistId: "PLdZNFVCDo_1eg-ZY-DqiinupITDgYbHrp",
-      episodeCount: 40,
-      category: "Geo Tv Serial",
-      reverseOrder: false
-  },
-  {
-      title: "Yahya",
-      image: "https://i.ytimg.com/vi/au1UqqUDInY/mqdefault.jpg",
-      playlistId: "PLdZNFVCDo_1eownwqYHc8gc74JhlLddAY",
-      episodeCount: 8,
-      category: "Geo Tv Serial",
-      reverseOrder: false
-  },
-  {
-      title: "Tobah",
-      image: "https://i.ytimg.com/vi/KQ-t7j_uytc/mqdefault.jpg",
-      playlistId: "PLdZNFVCDo_1eVrhB2dzEj9zuhbon9S9xV",
-      episodeCount: 85,
-      category: "Geo Tv Serial",
-      reverseOrder: false
-  },
-  {
-      title: "Gihrhein",
-      image: "https://i.ytimg.com/vi/GNjCvJmGX2k/mqdefault.jpg",
-      playlistId: "PLdZNFVCDo_1fSqh6-uKrQFceeP4bmLTye",
-      episodeCount: 88,
-      category: "Geo Tv Serial",
-      reverseOrder: false
-  },
-  {
-      title: "Teri Meri Kahani",
-      image: "https://i.ytimg.com/vi/Rqz9RIeCvpI/mqdefault.jpg",
-      playlistId: "PLdZNFVCDo_1e4qKAI91oMiMS_qs2tb4Qg",
-      episodeCount: 12,
-      category: "Geo Tv Serial",
-      reverseOrder: false
-  },
-  {
-      title: "Dil e Nadaan",
-      image: "https://i.ytimg.com/vi/aKXdT2N7xTI/mqdefault.jpg",
-      playlistId: "PLdZNFVCDo_1cVdqdGk4uHWwMOF2S_nVKM",
-      episodeCount: 55,
-      category: "Geo Tv Serial",
-      reverseOrder: false
-  },
-  {
-      title: "Ishq Hua",
-      image: "https://i.ytimg.com/vi/cdf8fnIC-gw/mqdefault.jpg",
-      playlistId: "PLdZNFVCDo_1djKaTn_tAXlKk_e3tz6sS4",
-      episodeCount: 9,
-      category: "Geo Tv Serial",
-      reverseOrder: false
-  },
-  
-  
-  {
-      title: "Haq Mehar",
-      image: "https://i.ytimg.com/vi/btH6OctgZPc/mqdefault.jpg",
-      playlistId: 'PLdZNFVCDo_1cCC3_Qql4V9gX8q6WD6PM2',
-      episodeCount: 72,
-      category: "Geo Tv Serial",
-      reverseOrder: false
-  },
-{
-      title: "Habil Aur Qabil",
-      image: "https://i.ytimg.com/vi/3Cst2DLNWNM/mqdefault.jpg",
-      playlistId: 'PLdZNFVCDo_1druAeJaa6wQ38SkW92q6rH',
-      episodeCount: 47,
-      category: "Geo Tv Serial",
-      reverseOrder: false
-  },
-{
-      title: "Chaal",
-      image: "https://i.ytimg.com/vi/mEY5HKn61Gc/mqdefault.jpg",
-      playlistId: 'PLdZNFVCDo_1dseFv0ywDzSDHIhOxF_R2l',
-      episodeCount: 56,
-      category: "Geo Tv Serial",
-      reverseOrder: false
-  },
-{
-      title: "Bayhadh",
-      image: "https://i.ytimg.com/vi/dGHxRfqQs28/mqdefault.jpg",
-      playlistId: 'PLdZNFVCDo_1e83IRGqIADJfQsgE9YQ48C',
-      episodeCount: 41,
-      category: "Geo Tv Serial",
-      reverseOrder: false
-  },
-{
-      title: "Dao",
-      image: "https://i.ytimg.com/vi/iByqwD5XsXE/mqdefault.jpg",
-      playlistId: 'PLdZNFVCDo_1cUW8JhMz7kC--z9tMVEP70',
-      episodeCount: 84,
-      category: "Geo Tv Serial",
-      reverseOrder: false
-  },
-{
-      title: "Muhabbat Daagh Ki Soorat",
-      image: "https://i.ytimg.com/vi/BPm1GOYvXuw/mqdefault.jpg",
-      playlistId: 'PLdZNFVCDo_1dag-T-aior99g_U9rPdau_',
-      episodeCount: 20,
-      category: "Geo Tv Serial",
-      reverseOrder: false
-  },
-{
-      title: "Shiddat",
-      image: "https://i.ytimg.com/vi/OPe_HotTaug/mqdefault.jpg",
-      playlistId: 'PLdZNFVCDo_1eQViJaqJ_nGzg96in9Wu9f',
-      episodeCount: 64,
-      category: "Geo Tv Serial",
-      reverseOrder: false
-  },
-{
-      title: "Dil Muhallay Ki Haveli",
-      image: "https://i.ytimg.com/vi/JEKilOwldJc/mqdefault.jpg",
-      playlistId: 'PLdZNFVCDo_1eeovn40y3BpZelqIWH3iIT',
-      episodeCount: 22,
-      category: "Geo Tv Serial",
-      reverseOrder: false
-  },
-
-{
-      title: "Khumaar",
-      image: "https://i.ytimg.com/vi/HVAar2wlMyQ/mqdefault.jpg",
-      playlistId: 'PLdZNFVCDo_1d2L_Cgax7XmEaIMfqCxwGW',
-      episodeCount: 50,
-      category: "Geo Tv Serial",
-      reverseOrder: false
-  }
-];
-
-// Global variables
-let player = null;
-let currentDramaIndex = 0;
-let currentUserEpisodeIndex = 0;
-let hideTimeout;
-let currentPlaylistId = '';
-let playerReady = false;
-let currentPage = 'dramas';
-let isAdPlaying = false;
-let controlsVisible = true;
-let loadingInterval = null;
-let wasPlayingBeforeAd = false;
-
-// Pagination variables
-let currentPageNumber = 1;
-const dramasPerPage = 15;
-let loadedDramasCount = 0;
-let totalDramas = dramas.length;
-
-// Browser back button setup (unchanged)
-function setupBrowserBackButton() {
-    window.addEventListener('popstate', function() {
-        if (currentPage === 'episodes') goBackToDramas();
-    });
-    
-    function pushHistoryState() {
-        let state = (currentPage === 'episodes') ? { page: 'episodes' } : { page: 'dramas' };
-        let hash = (currentPage === 'episodes') ? '#episodes' : '#';
-        history.pushState(state, '', hash);
-    }
-    
-    history.replaceState({ page: 'dramas' }, '', '#');
-    return pushHistoryState;
-}
-
-// Show loading animation (unchanged)
-function showLoading() {
-    const playerArea = document.getElementById('playerArea');
-    if (!playerArea) return;
-    
-    hideLoading();
-    
-    const loadingOverlay = document.createElement('div');
-    loadingOverlay.id = 'loadingOverlay';
-    loadingOverlay.style.cssText = `
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.95);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        z-index: 20;
-        backdrop-filter: blur(3px);
-    `;
-    
-    const spinner = document.createElement('div');
-    spinner.style.cssText = `
-        width: 60px;
-        height: 60px;
-        border: 5px solid rgba(255, 255, 255, 0.1);
-        border-radius: 50%;
-        border-top-color: var(--pink);
-        animation: spin 1s linear infinite;
-        margin-bottom: 20px;
-    `;
-    
-    const loadingText = document.createElement('div');
-    loadingText.style.cssText = `
-        color: white;
-        font-size: 16px;
-        font-weight: bold;
-        text-align: center;
-        letter-spacing: 1px;
-        background: linear-gradient(90deg, var(--pink), var(--neon-blue));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    `;
-    loadingText.textContent = 'Loading...';
-    
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    `;
-    
-    loadingOverlay.appendChild(style);
-    loadingOverlay.appendChild(spinner);
-    loadingOverlay.appendChild(loadingText);
-    
-    playerArea.appendChild(loadingOverlay);
-    
-    let dots = 0;
-    loadingInterval = setInterval(() => {
-        dots = (dots + 1) % 4;
-        loadingText.textContent = 'Loading' + '.'.repeat(dots);
-    }, 500);
-}
-
-// Hide loading animation (unchanged)
-function hideLoading() {
-    const loadingOverlay = document.getElementById('loadingOverlay');
-    if (loadingOverlay) {
-        loadingOverlay.remove();
-    }
-    if (loadingInterval) {
-        clearInterval(loadingInterval);
-        loadingInterval = null;
-    }
-}
-
-// Function to create a drama card
-function createDramaCard(drama, index) {
-    const dramaCard = document.createElement('div');
-    dramaCard.className = 'drama-card';
-    dramaCard.innerHTML = `
-        <div class="drama-image-container">
-            <img src="${drama.image}" alt="${drama.title}" class="drama-image" loading="lazy">
-            <div class="image-overlay"><div class="watch-text">Watch ${drama.episodeCount} Episodes</div></div>
-        </div>
-        <div class="drama-info">
-            <div class="drama-title">${drama.title}</div>
-            <div class="drama-year">${drama.category ? drama.category + ' • ' : ''}${drama.episodeCount} Episodes</div>
-        </div>
-    `;
-    dramaCard.onclick = () => openDramaEpisodes(index);
-    return dramaCard;
-}
-
-// Render dramas list with pagination
-function renderDramas(dramaList, page = 1, append = false) {
-    currentPage = 'dramas';
-    
-    const dramaGrid = document.getElementById('dramaGrid');
-    
-    // If not appending, clear the grid first
-    if (!append) {
-        dramaGrid.innerHTML = '';
-        document.getElementById('playerContainer').innerHTML = '';
-        document.getElementById('dramaInfoContainer').innerHTML = '';
-        document.getElementById('episodesContainer').innerHTML = '';
-        document.getElementById('fixedBackButton').style.display = 'none';
-        dramaGrid.style.display = 'grid';
-        document.body.classList.remove('player-open');
-        
-        if (player) { 
-            try { 
-                player.destroy(); 
-                player = null; 
-            } catch (e) {
-                console.error('Error destroying player:', e);
-            } 
-        }
-        
-        isAdPlaying = false;
-        controlsVisible = true;
-        hideLoading();
-        
-        // Reset pagination when starting fresh
-        currentPageNumber = page;
-        loadedDramasCount = 0;
-    }
-    
-    // Calculate start and end index for current page
-    const startIndex = (page - 1) * dramasPerPage;
-    const endIndex = Math.min(startIndex + dramasPerPage, dramaList.length);
-    
-    // Add dramas for current page
-    for (let i = startIndex; i < endIndex; i++) {
-        const drama = dramaList[i];
-        const dramaCard = createDramaCard(drama, i);
-        dramaGrid.appendChild(dramaCard);
-        loadedDramasCount++;
-    }
-    
-    // Remove existing See More button if any
-    const existingSeeMore = document.getElementById('seeMoreContainer');
-    if (existingSeeMore) {
-        existingSeeMore.remove();
-    }
-    
-    // Remove existing drama count if any
-    const existingCount = document.getElementById('dramaCountDisplay');
-    if (existingCount) {
-        existingCount.remove();
-    }
-    
-    // Show drama count
-    const dramaCountDisplay = document.createElement('div');
-    dramaCountDisplay.id = 'dramaCountDisplay';
-    dramaCountDisplay.className = 'drama-count';
-    dramaCountDisplay.textContent = `Showing ${loadedDramasCount} of ${totalDramas} dramas`;
-    dramaGrid.appendChild(dramaCountDisplay);
-    
-    // If there are more dramas to show, add See More button
-    if (loadedDramasCount < totalDramas) {
-        const seeMoreContainer = document.createElement('div');
-        seeMoreContainer.id = 'seeMoreContainer';
-        seeMoreContainer.className = 'see-more-container';
-        
-        const remainingDramas = totalDramas - loadedDramasCount;
-        const nextBatch = Math.min(dramasPerPage, remainingDramas);
-        
-        seeMoreContainer.innerHTML = `
-            <button class="see-more-btn" id="seeMoreBtn">
-                <span>See More</span> (Load ${nextBatch} more dramas)
-            </button>
-        `;
-        dramaGrid.appendChild(seeMoreContainer);
-        
-        // Add event listener to See More button
-        document.getElementById('seeMoreBtn').onclick = () => loadMoreDramas(dramaList);
-    }
-    
-    if (window.pushHistoryState && !append) window.pushHistoryState();
-}
-
-// Load more dramas
-function loadMoreDramas(dramaList) {
-    const seeMoreBtn = document.getElementById('seeMoreBtn');
-    if (!seeMoreBtn) return;
-    
-    // Disable button and show loading
-    seeMoreBtn.disabled = true;
-    seeMoreBtn.classList.add('loading');
-    
-    // Simulate loading delay for better UX
-    setTimeout(() => {
-        // Calculate next page
-        currentPageNumber++;
-        
-        // Render next page (append to existing)
-        renderDramas(dramaList, currentPageNumber, true);
-        
-        // Smooth scroll to show new content
-        const newCardsStart = (currentPageNumber - 1) * dramasPerPage;
-        const firstNewCard = document.querySelector(`.drama-card:nth-child(${newCardsStart + 1})`);
-        if (firstNewCard) {
-            firstNewCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-    }, 500);
-}
-
-// Open drama episodes (unchanged except for saving pagination state)
-function openDramaEpisodes(dramaIndex) {
-    // Save current pagination state
-    if (currentPage === 'dramas') {
-        window.lastDramaViewState = {
-            page: currentPageNumber,
-            loadedCount: loadedDramasCount,
-            scrollPosition: window.scrollY
-        };
-    }
-    
-    currentPage = 'episodes';
-    currentDramaIndex = dramaIndex;
-    const drama = dramas[dramaIndex];
-    currentPlaylistId = drama.playlistId;
-    document.getElementById('dramaGrid').style.display = 'none';
-    document.getElementById('fixedBackButton').style.display = 'flex';
-    document.body.classList.add('player-open');
-    controlsVisible = true;
-    hideLoading();
-
-    const playerContainer = document.getElementById('playerContainer');
-    // openDramaEpisodes function میں playerContainer.innerHTML کو یہ structure دیں:
-playerContainer.innerHTML = `
-    <div class="player-box" id="playerBox" style="display: block;">
-        <div class="player-content show-ui" id="playerArea">
-            <!-- Video Container - New div added -->
-            <div class="video-area" style="flex: 1; position: relative; overflow: hidden;">
-                <div class="yt-iframe-wrapper" id="ytWrapper">
-                    <div id="youtube-player"></div>
-                </div>
-                <img src="${drama.image}" class="drama-player-image" id="dramaPlayerImage" style="display: block;">
-                
-                <!-- Touch Layer - Click to toggle controls -->
-                <div id="touchLayer" onclick="handleTouchLayerClick()"></div>
-            </div>
             
-            <!-- Bottom Controls - This will stay at bottom -->
-            <div class="bottom-ui" onclick="event.stopPropagation()">
-                <div class="p-bar" onclick="seek(event)">
-                    <div class="p-fill" id="pFill"></div>
-                </div>
-                <div class="controls-container">
-                    <div class="left-controls">
-                        <button class="skip-btn" onclick="skip(-10); event.stopPropagation()">
-                            <span>↺</span>10s
-                        </button>
-                        <button class="control-btn play-pause-btn" onclick="handlePlayPauseClick(); event.stopPropagation()" id="playIcon">▶</button>
-                        <button class="skip-btn" onclick="skip(10); event.stopPropagation()">
-                            <span>↻</span>10s
-                        </button>
-                        <div class="time-display">
-                            <span id="currTime">0:00</span> / <span id="totalTime">0:00</span>
+            
+            
+            
+        ];
+
+        let player = null;
+        let currentDramaIndex = 0;
+        let currentUserEpisodeIndex = 0;
+        let hideTimeout;
+        let currentPlaylistId = '';
+        let playerReady = false;
+        let currentPage = 'dramas';
+        let isAdPlaying = false;
+        let controlsVisible = true;
+        let loadingInterval = null;
+        let wasPlayingBeforeAd = false;
+
+        // Browser back button setup
+        function setupBrowserBackButton() {
+            window.addEventListener('popstate', function() {
+                if (currentPage === 'episodes') goBackToDramas();
+            });
+            
+            function pushHistoryState() {
+                let state = (currentPage === 'episodes') ? { page: 'episodes' } : { page: 'dramas' };
+                let hash = (currentPage === 'episodes') ? '#episodes' : '#';
+                history.pushState(state, '', hash);
+            }
+            
+            history.replaceState({ page: 'dramas' }, '', '#');
+            return pushHistoryState;
+        }
+
+        // Show loading animation
+        function showLoading() {
+            const playerArea = document.getElementById('playerArea');
+            if (!playerArea) return;
+            
+            // Remove existing loading if present
+            hideLoading();
+            
+            // Create loading overlay
+            const loadingOverlay = document.createElement('div');
+            loadingOverlay.id = 'loadingOverlay';
+            loadingOverlay.style.cssText = `
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.95);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                z-index: 20;
+                backdrop-filter: blur(3px);
+            `;
+            
+            // Create loading spinner
+            const spinner = document.createElement('div');
+            spinner.style.cssText = `
+                width: 60px;
+                height: 60px;
+                border: 5px solid rgba(255, 255, 255, 0.1);
+                border-radius: 50%;
+                border-top-color: var(--pink);
+                animation: spin 1s linear infinite;
+                margin-bottom: 20px;
+            `;
+            
+            // Create loading text
+            const loadingText = document.createElement('div');
+            loadingText.style.cssText = `
+                color: white;
+                font-size: 16px;
+                font-weight: bold;
+                text-align: center;
+                letter-spacing: 1px;
+                background: linear-gradient(90deg, var(--pink), var(--neon-blue));
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            `;
+            loadingText.textContent = 'Loading...';
+            
+            // Add CSS animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            `;
+            
+            loadingOverlay.appendChild(style);
+            loadingOverlay.appendChild(spinner);
+            loadingOverlay.appendChild(loadingText);
+            
+            playerArea.appendChild(loadingOverlay);
+            
+            // Add dots animation to text
+            let dots = 0;
+            loadingInterval = setInterval(() => {
+                dots = (dots + 1) % 4;
+                loadingText.textContent = 'Loading' + '.'.repeat(dots);
+            }, 500);
+        }
+
+        // Hide loading animation
+        function hideLoading() {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            if (loadingOverlay) {
+                loadingOverlay.remove();
+            }
+            if (loadingInterval) {
+                clearInterval(loadingInterval);
+                loadingInterval = null;
+            }
+        }
+
+        // Render dramas list - NEW DESIGN
+        function renderDramas(dramaList) {
+            currentPage = 'dramas';
+            const dramaGrid = document.getElementById('dramaGrid');
+            dramaGrid.innerHTML = '';
+            document.getElementById('playerContainer').innerHTML = '';
+            document.getElementById('dramaInfoContainer').innerHTML = '';
+            document.getElementById('episodesContainer').innerHTML = '';
+            document.getElementById('fixedBackButton').style.display = 'none';
+            dramaGrid.style.display = 'grid';
+            document.body.classList.remove('player-open');
+            
+            if (player) { 
+                try { 
+                    player.destroy(); 
+                    player = null; 
+                } catch (e) {
+                    console.error('Error destroying player:', e);
+                } 
+            }
+            
+            isAdPlaying = false;
+            controlsVisible = true;
+            hideLoading();
+
+            dramaList.forEach((drama, index) => {
+                const dramaCard = document.createElement('div');
+                dramaCard.className = 'drama-card';
+                dramaCard.innerHTML = `
+                    <div class="drama-image-container">
+                        <img src="${drama.image}" alt="${drama.title}" class="drama-image" loading="lazy">
+                        <div class="image-overlay"><div class="watch-text">Watch ${drama.episodeCount} Episodes</div></div>
+                    </div>
+                    <div class="drama-info">
+                        <div class="drama-title">${drama.title}</div>
+                        <div class="drama-year">${drama.category ? drama.category + ' • ' : ''}${drama.episodeCount} Episodes</div>
+                    </div>
+                `;
+                dramaCard.onclick = () => openDramaEpisodes(index);
+                dramaGrid.appendChild(dramaCard);
+            });
+            
+            if (window.pushHistoryState) window.pushHistoryState();
+        }
+
+        // Open drama episodes
+        function openDramaEpisodes(dramaIndex) {
+            currentPage = 'episodes';
+            currentDramaIndex = dramaIndex;
+            const drama = dramas[dramaIndex];
+            currentPlaylistId = drama.playlistId;
+            document.getElementById('dramaGrid').style.display = 'none';
+            document.getElementById('fixedBackButton').style.display = 'flex';
+            document.body.classList.add('player-open');
+            controlsVisible = true;
+            hideLoading();
+
+            const playerContainer = document.getElementById('playerContainer');
+            playerContainer.innerHTML = `
+                <div class="player-box" id="playerBox" style="display: block;">
+                    <div class="player-content show-ui" id="playerArea">
+                        <div class="yt-iframe-wrapper" id="ytWrapper">
+                            <div id="youtube-player"></div>
+                        </div>
+                        <img src="${drama.image}" class="drama-player-image" id="dramaPlayerImage" style="display: block;">
+                        
+                        <!-- Touch Layer - Click to toggle controls -->
+                        <div id="touchLayer" onclick="handleTouchLayerClick()"></div>
+                        
+                        <!-- Bottom Controls -->
+                        <div class="bottom-ui" onclick="event.stopPropagation()">
+                            <div class="p-bar" onclick="seek(event)">
+                                <div class="p-fill" id="pFill"></div>
+                            </div>
+                            <div class="controls-container">
+                                <div class="left-controls">
+                                    <button class="skip-btn" onclick="skip(-10); event.stopPropagation()">
+                                        <span>↺</span>10s
+                                    </button>
+                                    <button class="control-btn play-pause-btn" onclick="handlePlayPauseClick(); event.stopPropagation()" id="playIcon">▶</button>
+                                    <button class="skip-btn" onclick="skip(10); event.stopPropagation()">
+                                        <span>↻</span>10s
+                                    </button>
+                                    <div class="time-display">
+                                        <span id="currTime">0:00</span> / <span id="totalTime">0:00</span>
+                                    </div>
+                                </div>
+                                <div class="right-controls">
+                                    <button class="fullscreen-btn" onclick="toggleFullscreen(); event.stopPropagation()">⛶</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="right-controls">
-                        <button class="fullscreen-btn" onclick="toggleFullscreen(); event.stopPropagation()">⛶</button>
-                    </div>
                 </div>
-            </div>
-        </div>
-    </div>
-`;
-    
+            `;
 
-    // Setup back button
-    document.getElementById('fixedBackButton').onclick = goBackToDramas;
-    
-    // Setup scroll to top button
-    document.querySelector('.scroll-top-btn').onclick = () => window.scrollTo({top: 0, behavior: 'smooth'});
+            // Setup back button
+            document.getElementById('fixedBackButton').onclick = goBackToDramas;
+            
+            // Setup scroll to top button
+            document.querySelector('.scroll-top-btn').onclick = () => window.scrollTo({top: 0, behavior: 'smooth'});
 
-    // Render episodes
-    const episodesContainer = document.getElementById('episodesContainer');
-    episodesContainer.innerHTML = `<div class="episodes-grid" id="episodesGrid"></div>`;
-    const episodesGrid = document.getElementById('episodesGrid');
-    
-    for (let i = 0; i < drama.episodeCount; i++) {
-        const btn = document.createElement('button');
-        btn.className = 'episode-button';
-        btn.id = `ep-button-${i}`;
-        btn.innerHTML = `Episode ${i + 1}`;
-        btn.onclick = (e) => { 
-            e.stopPropagation(); 
-            openPlayer(i); 
-        };
-        episodesGrid.appendChild(btn);
-    }
-
-    loadYouTubeAPI();
-}
-
-// Load YouTube API (unchanged)
-function loadYouTubeAPI() {
-    if (window.YT && window.YT.Player) {
-        initializePlayer();
-    } else {
-        const tag = document.createElement('script');
-        tag.src = "https://www.youtube.com/iframe_api";
-        document.head.appendChild(tag);
-        window.onYouTubeIframeAPIReady = initializePlayer;
-    }
-}
-
-// Initialize YouTube player (unchanged)
-function initializePlayer() {
-    if (player) {
-        try {
-            player.destroy();
-        } catch (e) {
-            console.error('Error destroying existing player:', e);
-        }
-    }
-    
-    player = new YT.Player('youtube-player', {
-        height: '100%', 
-        width: '100%',
-        playerVars: { 
-            'autoplay': 0, 
-            'controls': 0,
-            'modestbranding': 1, 
-            'rel': 0, 
-            'playsinline': 1, 
-            'enablejsapi': 1,
-            'fs': 0,
-            'showinfo': 0,
-            'iv_load_policy': 3,
-            'disablekb': 1,
-            'autohide': 2,
-            'cc_load_policy': 0,
-            'widget_referrer': 1,
-        },
-        events: { 
-            'onReady': onPlayerReady, 
-            'onStateChange': onPlayerStateChange 
-        }
-    });
-    
-    setInterval(updateProgress, 500);
-}
-
-// Player ready callback (unchanged)
-function onPlayerReady() {
-    playerReady = true;
-    console.log('YouTube Player is ready');
-    
-    const playerArea = document.getElementById('playerArea');
-    if (playerArea) {
-        playerArea.classList.add('show-ui');
-    }
-    controlsVisible = true;
-}
-
-// Open specific episode (unchanged)
-function openPlayer(userEpisodeIndex) {
-    if (!player || !playerReady) {
-        console.error('Player not ready');
-        return;
-    }
-    
-    const drama = dramas[currentDramaIndex];
-    currentUserEpisodeIndex = userEpisodeIndex;
-    let playlistIndex = drama.reverseOrder ? (drama.episodeCount - 1 - userEpisodeIndex) : userEpisodeIndex;
-
-    if (player && player.getPlayerState) {
-        const currentState = player.getPlayerState();
-        if (currentState === YT.PlayerState.PLAYING || currentState === YT.PlayerState.BUFFERING) {
-            player.pauseVideo();
-            wasPlayingBeforeAd = true;
-        }
-    }
-    
-    showLoading();
-    
-    const dramaImage = document.getElementById('dramaPlayerImage');
-    if (dramaImage) dramaImage.style.display = 'none';
-
-    player.loadPlaylist({
-        list: currentPlaylistId,
-        listType: 'playlist',
-        index: playlistIndex
-    });
-
-    document.querySelectorAll('.episode-button').forEach(el => el.classList.remove('active'));
-    document.getElementById(`ep-button-${userEpisodeIndex}`)?.classList.add('active');
-    
-    showControls();
-}
-
-// Player state change callback (unchanged)
-function onPlayerStateChange(event) {
-    const dramaImage = document.getElementById('dramaPlayerImage');
-    const playIcon = document.getElementById('playIcon');
-    const playerArea = document.getElementById('playerArea');
-
-    let videoData = player.getVideoData();
-    isAdPlaying = (videoData && (videoData.ad === 1 || videoData.title === "Advertisement" || videoData.isPlayable === false));
-
-    if (event.data === YT.PlayerState.PLAYING) {
-        hideLoading();
-        
-        if (dramaImage) dramaImage.style.display = 'none';
-        if (playIcon) playIcon.innerText = '||';
-
-        if (isAdPlaying) {
-            playerArea.setAttribute('data-ad-playing', 'true');
-            showControls();
-            wasPlayingBeforeAd = true;
-        } else {
-            playerArea.setAttribute('data-ad-playing', 'false');
-            if (controlsVisible) {
-                startAutoHideTimer();
+            // Render episodes
+            const episodesContainer = document.getElementById('episodesContainer');
+            episodesContainer.innerHTML = `<div class="episodes-grid" id="episodesGrid"></div>`;
+            const episodesGrid = document.getElementById('episodesGrid');
+            
+            for (let i = 0; i < drama.episodeCount; i++) {
+                const btn = document.createElement('button');
+                btn.className = 'episode-button';
+                btn.id = `ep-button-${i}`;
+                btn.innerHTML = `Episode ${i + 1}`;
+                btn.onclick = (e) => { 
+                    e.stopPropagation(); 
+                    openPlayer(i); 
+                };
+                episodesGrid.appendChild(btn);
             }
-            wasPlayingBeforeAd = false;
+
+            loadYouTubeAPI();
         }
-    } 
-    else if (event.data === YT.PlayerState.PAUSED) {
-        if (playIcon) playIcon.innerText = '▶';
-        
-        if (!isAdPlaying && dramaImage) {
-            dramaImage.style.display = 'block';
+
+        // Load YouTube API
+        function loadYouTubeAPI() {
+            if (window.YT && window.YT.Player) {
+                initializePlayer();
+            } else {
+                const tag = document.createElement('script');
+                tag.src = "https://www.youtube.com/iframe_api";
+                document.head.appendChild(tag);
+                window.onYouTubeIframeAPIReady = initializePlayer;
+            }
         }
-        
-        showControls();
-        clearTimeout(hideTimeout);
-    }
-    else if (event.data === YT.PlayerState.ENDED) {
-        hideLoading();
-        
-        if (dramaImage) dramaImage.style.display = 'block';
-        if (playIcon) playIcon.innerText = '▶';
-        
-        showControls();
-        clearTimeout(hideTimeout);
-    }
-    else if (event.data === YT.PlayerState.BUFFERING) {
-        if (isAdPlaying) {
-            hideLoading();
-        } else if (player.getPlayerState() !== YT.PlayerState.PLAYING) {
+
+        // Initialize YouTube player
+        function initializePlayer() {
+            if (player) {
+                try {
+                    player.destroy();
+                } catch (e) {
+                    console.error('Error destroying existing player:', e);
+                }
+            }
+            
+            player = new YT.Player('youtube-player', {
+                height: '100%', 
+                width: '100%',
+                playerVars: { 
+                    'autoplay': 0, 
+                    'controls': 0,
+                    'modestbranding': 1, 
+                    'rel': 0, 
+                    'playsinline': 1, 
+                    'enablejsapi': 1,
+                    'fs': 0,
+                    'showinfo': 0,
+                    'iv_load_policy': 3,
+                    'disablekb': 1,
+                    'autohide': 2,
+                    'cc_load_policy': 0,
+                    'widget_referrer': 1,
+                },
+                events: { 
+                    'onReady': onPlayerReady, 
+                    'onStateChange': onPlayerStateChange 
+                }
+            });
+            
+            setInterval(updateProgress, 500);
+        }
+
+        // Player ready callback
+        function onPlayerReady() {
+            playerReady = true;
+            console.log('YouTube Player is ready');
+            
+            // Ensure controls are visible when player is ready
+            const playerArea = document.getElementById('playerArea');
+            if (playerArea) {
+                playerArea.classList.add('show-ui');
+            }
+            controlsVisible = true;
+        }
+
+        // Open specific episode
+        function openPlayer(userEpisodeIndex) {
+            if (!player || !playerReady) {
+                console.error('Player not ready');
+                return;
+            }
+            
+            const drama = dramas[currentDramaIndex];
+            currentUserEpisodeIndex = userEpisodeIndex;
+            let playlistIndex = drama.reverseOrder ? (drama.episodeCount - 1 - userEpisodeIndex) : userEpisodeIndex;
+
+            // Stop current video if playing
+            if (player && player.getPlayerState) {
+                const currentState = player.getPlayerState();
+                if (currentState === YT.PlayerState.PLAYING || currentState === YT.PlayerState.BUFFERING) {
+                    player.pauseVideo();
+                    wasPlayingBeforeAd = true;
+                }
+            }
+            
+            // Show loading animation
             showLoading();
+            
+            // Episode click karte hi Image foran hide hogi
+            const dramaImage = document.getElementById('dramaPlayerImage');
+            if (dramaImage) dramaImage.style.display = 'none';
+
+            player.loadPlaylist({
+                list: currentPlaylistId,
+                listType: 'playlist',
+                index: playlistIndex
+            });
+
+            // Update active episode button
+            document.querySelectorAll('.episode-button').forEach(el => el.classList.remove('active'));
+            document.getElementById(`ep-button-${userEpisodeIndex}`)?.classList.add('active');
+            
+            // Show controls when switching episodes
+            showControls();
         }
-    }
-    else if (event.data === YT.PlayerState.CUED) {
-        hideLoading();
-    }
-    else if (event.data === YT.PlayerState.UNSTARTED) {
-        hideLoading();
-    }
-    
-    checkForAd();
-}
 
-// Check for ad detection (unchanged)
-function checkForAd() {
-    if (!player) return;
-    
-    const videoData = player.getVideoData();
-    const isCurrentlyAd = (videoData && (videoData.ad === 1 || videoData.title === "Advertisement" || videoData.isPlayable === false));
-    
-    if (isCurrentlyAd && !isAdPlaying) {
-        isAdPlaying = true;
-        hideLoading();
-    } else if (!isCurrentlyAd && isAdPlaying) {
-        isAdPlaying = false;
-    }
-}
+        // Player state change callback
+        function onPlayerStateChange(event) {
+            const dramaImage = document.getElementById('dramaPlayerImage');
+            const playIcon = document.getElementById('playIcon');
+            const playerArea = document.getElementById('playerArea');
 
-// Start auto-hide timer for controls (unchanged)
-function startAutoHideTimer() {
-    clearTimeout(hideTimeout);
-    hideTimeout = setTimeout(() => {
-        if (!isAdPlaying && player && player.getPlayerState() === YT.PlayerState.PLAYING) {
-            hideControls();
+            let videoData = player.getVideoData();
+            isAdPlaying = (videoData && (videoData.ad === 1 || videoData.title === "Advertisement" || videoData.isPlayable === false));
+
+            if (event.data === YT.PlayerState.PLAYING) {
+                // Hide loading when video or ad starts playing
+                hideLoading();
+                
+                // Image hide rakhein jab video ya ad chal raha ho
+                if (dramaImage) dramaImage.style.display = 'none';
+                if (playIcon) playIcon.innerText = '||';
+
+                if (isAdPlaying) {
+                    // Ad کے دوران ہمیشہ controls دکھائیں
+                    playerArea.setAttribute('data-ad-playing', 'true');
+                    showControls();
+                    // Track that ad started playing
+                    wasPlayingBeforeAd = true;
+                } else {
+                    playerArea.setAttribute('data-ad-playing', 'false');
+                    // Video playing - start auto-hide timer after 5 seconds
+                    if (controlsVisible) {
+                        startAutoHideTimer();
+                    }
+                    // If was playing before ad, reset the flag
+                    wasPlayingBeforeAd = false;
+                }
+            } 
+            else if (event.data === YT.PlayerState.PAUSED) {
+                if (playIcon) playIcon.innerText = '▶';
+                
+                // Pause par image tabhi dikhayen agar ad na ho
+                if (!isAdPlaying && dramaImage) {
+                    dramaImage.style.display = 'block';
+                }
+                
+                // Pause ہونے پر controls دکھائیں اور auto-hide روکیں
+                showControls();
+                clearTimeout(hideTimeout);
+            }
+            else if (event.data === YT.PlayerState.ENDED) {
+                // Hide loading if still showing
+                hideLoading();
+                
+                if (dramaImage) dramaImage.style.display = 'block';
+                if (playIcon) playIcon.innerText = '▶';
+                
+                // Video ختم ہونے پر controls دکھائیں
+                showControls();
+                clearTimeout(hideTimeout);
+            }
+            else if (event.data === YT.PlayerState.BUFFERING) {
+                // Check if it's buffering for an ad
+                if (isAdPlaying) {
+                    // If it's an ad and buffering, hide loading
+                    hideLoading();
+                } else if (player.getPlayerState() !== YT.PlayerState.PLAYING) {
+                    // Only show loading if not already playing and not an ad
+                    showLoading();
+                }
+            }
+            else if (event.data === YT.PlayerState.CUED) {
+                // Hide loading when video is cued
+                hideLoading();
+            }
+            else if (event.data === YT.PlayerState.UNSTARTED) {
+                // Hide loading when video is unstarted (like after loading playlist)
+                hideLoading();
+            }
+            
+            // Check for ad detection periodically
+            checkForAd();
         }
-    }, 5000);
-}
 
-// Show controls (unchanged)
-function showControls() {
-    const playerArea = document.getElementById('playerArea');
-    if (playerArea) {
-        playerArea.classList.add('show-ui');
-        controlsVisible = true;
-    }
-}
-
-// Hide controls (unchanged)
-function hideControls() {
-    const playerArea = document.getElementById('playerArea');
-    if (playerArea && !isAdPlaying) {
-        playerArea.classList.remove('show-ui');
-        controlsVisible = false;
-    }
-}
-
-// Toggle controls visibility (unchanged)
-function toggleControls() {
-    if (isAdPlaying) {
-        showControls();
-        return;
-    }
-    
-    if (controlsVisible) {
-        hideControls();
-    } else {
-        showControls();
-        
-        if (player && player.getPlayerState() === YT.PlayerState.PLAYING) {
-            startAutoHideTimer();
+        // Check for ad detection
+        function checkForAd() {
+            if (!player) return;
+            
+            const videoData = player.getVideoData();
+            const isCurrentlyAd = (videoData && (videoData.ad === 1 || videoData.title === "Advertisement" || videoData.isPlayable === false));
+            
+            if (isCurrentlyAd && !isAdPlaying) {
+                // Ad just started
+                isAdPlaying = true;
+                hideLoading(); // Hide loading when ad starts
+            } else if (!isCurrentlyAd && isAdPlaying) {
+                // Ad just ended
+                isAdPlaying = false;
+            }
         }
-    }
-}
 
-// Touch layer click handler (unchanged)
-function handleTouchLayerClick() {
-    toggleControls();
-}
-
-// Play/Pause handler (unchanged)
-function handlePlayPauseClick() {
-    if (isAdPlaying) return;
-    
-    const state = player.getPlayerState();
-    const playIcon = document.getElementById('playIcon');
-    const dramaImage = document.getElementById('dramaPlayerImage');
-    
-    if (state === YT.PlayerState.PLAYING) {
-        player.pauseVideo();
-        if (playIcon) playIcon.innerText = '▶';
-        if (dramaImage) dramaImage.style.display = 'block';
-    } else {
-        player.playVideo();
-        if (playIcon) playIcon.innerText = '||';
-        if (dramaImage) dramaImage.style.display = 'none';
-    }
-}
-
-// Skip function (unchanged)
-function skip(seconds) {
-    if (isAdPlaying) return;
-    
-    const currentTime = player.getCurrentTime();
-    const newTime = currentTime + seconds;
-    
-    if (newTime < 0) {
-        player.seekTo(0, true);
-    } else if (newTime > player.getDuration()) {
-        nextEp();
-    } else {
-        player.seekTo(newTime, true);
-    }
-}
-
-// Update progress bar (unchanged)
-function updateProgress() {
-    if (player && player.getCurrentTime && !isAdPlaying) {
-        const curr = player.getCurrentTime();
-        const dur = player.getDuration();
-        const pFill = document.getElementById('pFill');
-        
-        if (dur > 0 && pFill) {
-            pFill.style.width = (curr / dur * 100) + '%';
-            document.getElementById('currTime').innerText = formatTime(curr);
-            document.getElementById('totalTime').innerText = formatTime(dur);
+        // Start auto-hide timer for controls
+        function startAutoHideTimer() {
+            clearTimeout(hideTimeout);
+            hideTimeout = setTimeout(() => {
+                if (!isAdPlaying && player && player.getPlayerState() === YT.PlayerState.PLAYING) {
+                    hideControls();
+                }
+            }, 5000);
         }
-    }
-}
 
-// Format time (MM:SS) (unchanged)
-function formatTime(s) {
-    const m = Math.floor(s / 60);
-    const r = Math.floor(s % 60);
-    return m + ":" + (r < 10 ? '0' : '') + r;
-}
+        // Show controls
+        function showControls() {
+            const playerArea = document.getElementById('playerArea');
+            if (playerArea) {
+                playerArea.classList.add('show-ui');
+                controlsVisible = true;
+            }
+        }
 
-// Toggle fullscreen (unchanged)
-function toggleFullscreen() {
-    const el = document.getElementById('playerArea');
-    if (!document.fullscreenElement) {
-        el.requestFullscreen().catch(err => {
-            console.error(`Error attempting to enable fullscreen: ${err.message}`);
+        // Hide controls
+        function hideControls() {
+            const playerArea = document.getElementById('playerArea');
+            if (playerArea && !isAdPlaying) {
+                playerArea.classList.remove('show-ui');
+                controlsVisible = false;
+            }
+        }
+
+        // Toggle controls visibility
+        function toggleControls() {
+            if (isAdPlaying) {
+                // Ads کے دوران ہمیشہ controls دکھائیں
+                showControls();
+                return;
+            }
+            
+            if (controlsVisible) {
+                hideControls();
+            } else {
+                showControls();
+                
+                // If video is playing, start auto-hide timer
+                if (player && player.getPlayerState() === YT.PlayerState.PLAYING) {
+                    startAutoHideTimer();
+                }
+            }
+        }
+
+        // Touch layer click handler
+        function handleTouchLayerClick() {
+            toggleControls();
+        }
+
+        // Play/Pause handler
+        function handlePlayPauseClick() {
+            if (isAdPlaying) return;
+            
+            const state = player.getPlayerState();
+            const playIcon = document.getElementById('playIcon');
+            const dramaImage = document.getElementById('dramaPlayerImage');
+            
+            if (state === YT.PlayerState.PLAYING) {
+                player.pauseVideo();
+                if (playIcon) playIcon.innerText = '▶';
+                if (dramaImage) dramaImage.style.display = 'block';
+            } else {
+                player.playVideo();
+                if (playIcon) playIcon.innerText = '||';
+                if (dramaImage) dramaImage.style.display = 'none';
+            }
+        }
+
+        // Skip function
+        function skip(seconds) {
+            if (isAdPlaying) return;
+            
+            const currentTime = player.getCurrentTime();
+            const newTime = currentTime + seconds;
+            
+            if (newTime < 0) {
+                player.seekTo(0, true);
+            } else if (newTime > player.getDuration()) {
+                nextEp();
+            } else {
+                player.seekTo(newTime, true);
+            }
+        }
+
+        // Update progress bar
+        function updateProgress() {
+            if (player && player.getCurrentTime && !isAdPlaying) {
+                const curr = player.getCurrentTime();
+                const dur = player.getDuration();
+                const pFill = document.getElementById('pFill');
+                
+                if (dur > 0 && pFill) {
+                    pFill.style.width = (curr / dur * 100) + '%';
+                    document.getElementById('currTime').innerText = formatTime(curr);
+                    document.getElementById('totalTime').innerText = formatTime(dur);
+                }
+            }
+        }
+
+        // Format time (MM:SS)
+        function formatTime(s) {
+            const m = Math.floor(s / 60);
+            const r = Math.floor(s % 60);
+            return m + ":" + (r < 10 ? '0' : '') + r;
+        }
+
+        // Toggle fullscreen
+        function toggleFullscreen() {
+            const el = document.getElementById('playerArea');
+            if (!document.fullscreenElement) {
+                el.requestFullscreen().catch(err => {
+                    console.error(`Error attempting to enable fullscreen: ${err.message}`);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // Seek function
+        function seek(event) {
+            if (!player || isAdPlaying) return;
+            
+            const pBar = event.currentTarget;
+            const rect = pBar.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const width = rect.width;
+            const percentage = x / width;
+            
+            const duration = player.getDuration();
+            const newTime = percentage * duration;
+            
+            player.seekTo(newTime, true);
+            event.stopPropagation();
+        }
+
+        // Next episode
+        function nextEp() {
+            const drama = dramas[currentDramaIndex];
+            if (currentUserEpisodeIndex < drama.episodeCount - 1) {
+                openPlayer(currentUserEpisodeIndex + 1);
+            }
+        }
+
+        // Previous episode
+        function prevEp() {
+            if (currentUserEpisodeIndex > 0) {
+                openPlayer(currentUserEpisodeIndex - 1);
+            }
+        }
+
+        // Go back to dramas list
+        function goBackToDramas() {
+            if (player) { 
+                try { 
+                    player.destroy(); 
+                } catch(e) {
+                    console.error('Error destroying player:', e);
+                } 
+                player = null; 
+            }
+            
+            hideLoading();
+            renderDramas(dramas);
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize back button functionality
+            window.pushHistoryState = setupBrowserBackButton();
+            
+            // Render dramas on page load
+            renderDramas(dramas);
+            
+            // Setup scroll to top button
+            document.querySelector('.scroll-top-btn').onclick = () => window.scrollTo({top: 0, behavior: 'smooth'});
         });
-    } else {
-        document.exitFullscreen();
-    }
-}
-
-// Seek function (unchanged)
-function seek(event) {
-    if (!player || isAdPlaying) return;
-    
-    const pBar = event.currentTarget;
-    const rect = pBar.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const width = rect.width;
-    const percentage = x / width;
-    
-    const duration = player.getDuration();
-    const newTime = percentage * duration;
-    
-    player.seekTo(newTime, true);
-    event.stopPropagation();
-}
-
-// Next episode (unchanged)
-function nextEp() {
-    const drama = dramas[currentDramaIndex];
-    if (currentUserEpisodeIndex < drama.episodeCount - 1) {
-        openPlayer(currentUserEpisodeIndex + 1);
-    }
-}
-
-// Previous episode (unchanged)
-function prevEp() {
-    if (currentUserEpisodeIndex > 0) {
-        openPlayer(currentUserEpisodeIndex - 1);
-    }
-}
-
-// Go back to dramas list - UPDATED
-function goBackToDramas() {
-    if (player) { 
-        try { 
-            player.destroy(); 
-        } catch(e) {
-            console.error('Error destroying player:', e);
-        } 
-        player = null; 
-    }
-    
-    hideLoading();
-    
-    // Check if we need to restore pagination state
-    if (window.lastDramaViewState) {
-        // Restore to the exact page we were on
-        currentPageNumber = window.lastDramaViewState.page;
-        loadedDramasCount = window.lastDramaViewState.loadedCount;
-        
-        // Re-render dramas with the stored page
-        renderDramas(dramas, currentPageNumber, false);
-        
-        // Restore scroll position
-        setTimeout(() => {
-            window.scrollTo({ top: window.lastDramaViewState.scrollPosition || 0, behavior: 'smooth' });
-        }, 100);
-    } else {
-        // Fresh start
-        renderDramas(dramas);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-    
-    // Clear the stored state
-    window.lastDramaViewState = null;
-}
-
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize back button functionality
-    window.pushHistoryState = setupBrowserBackButton();
-    
-    // Calculate total dramas
-    totalDramas = dramas.length;
-    
-    // Render dramas on page load (first 15)
-    renderDramas(dramas, 1, false);
-    
-    // Setup scroll to top button
-    document.querySelector('.scroll-top-btn').onclick = () => window.scrollTo({top: 0, behavior: 'smooth'});
-});
     </script>
 </body>
 </html>
