@@ -18,8 +18,7 @@
             --neon-blue: #00f3ff;
             --neon-purple: #bc00ff;
             --neon-red: #ff0000;
-            --header-height: 220px;
-            --player-fixed-height: 270px;
+            --player-fixed-height: 350px;
         }
 
         * {
@@ -250,467 +249,418 @@
         }
 
         /* YOUTUBE PLAYER STYLES - FIXED AT TOP */
-.player-box {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: var(--player-fixed-height);
-    background: #000;
-    z-index: 1000;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.8);
-}
+        .player-box {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--player-fixed-height);
+            background: #000;
+            z-index: 1000;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.8);
+        }
 
-.player-content { 
-    width: 100%; 
-    height: 100%;
-    position: relative; 
-    overflow: hidden; 
-}
+        .player-content { 
+            width: 100%; 
+            height: 100%;
+            position: relative; 
+            overflow: hidden; 
+        }
 
-/* Main content margin when player is visible */
-body.player-open .main-content {
-    margin-top: calc(var(--player-fixed-height) + 20px);
-}
+        /* Main content margin when player is visible */
+        body.player-open .main-content {
+            margin-top: calc(var(--player-fixed-height) + 20px);
+        }
 
-/* DRAMA IMAGE IN PLAYER - FIXED HEIGHT & OVERLAY */
-.drama-player-image {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    object-position: center;
-    z-index: 5; /* YouTube player سے اوپر */
-    background-color: #000;
-    display: block; /* شروع میں show ہوگی */
-}
+        /* DRAMA IMAGE IN PLAYER - FIXED HEIGHT & OVERLAY */
+        .drama-player-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center;
+            z-index: 5;
+            background-color: #000;
+            display: block;
+        }
 
-/* YouTube Iframe Container */
-.yt-iframe-wrapper {
-    position: absolute; 
-    top: 0;
-    left: 0; 
-    width: 100%; 
-    height: 100%; 
-    z-index: 2; /* Poster کے نیچے */
-}
+        /* YouTube Iframe Container */
+        .yt-iframe-wrapper {
+            position: absolute; 
+            top: 0;
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            z-index: 1;
+            pointer-events: none; /* YouTube iframe کو کلیک ایونٹس سے block کریں */
+        }
 
-.yt-iframe-wrapper.active { 
-    opacity: 1; 
-}
+        .yt-iframe-wrapper.active { 
+            opacity: 1; 
+        }
 
-#youtube-player { 
-    width: 100%; 
-    height: 100%; 
-    border: none; 
-}
+        #youtube-player { 
+            width: 100%; 
+            height: 100%; 
+            border: none; 
+            pointer-events: none; /* YouTube player کلیکس کو block کریں */
+        }
 
-/* UI CONTROLS - FIXED WITH BLACK CONTAINER */
-.bottom-ui { 
-    position: absolute; 
-    bottom: 0;
-    left: 0; 
-    right: 0;
-    background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, rgba(0,0,0,0) 100%);
-    padding: 15px 15px 10px 15px; 
-    z-index: 6; /* Poster سے اوپر */
-    opacity: 1;
-    transition: opacity 0.3s ease;
-    backdrop-filter: blur(5px);
-}
+        /* TOUCH LAYER FOR BLOCKING YOUTUBE UI */
+        #touchLayer {
+            position: absolute;
+            inset: 0; /* top, right, bottom, left all 0 */
+            z-index: 10; /* YouTube player سے اوپر */
+            cursor: pointer;
+            background: transparent; /* Transparent رہے */
+        }
 
-.player-content.show-ui .bottom-ui { 
-    opacity: 1; 
-    pointer-events: auto;
-}
+        /* جب UI show ہو تو touch layer کو disable کریں */
+        .player-content.show-ui #touchLayer {
+            pointer-events: none;
+        }
 
-.player-content.hide-controls .bottom-ui {
-    opacity: 0 !important;
-    pointer-events: none !important;
-}
+        /* جب UI hide ہو تو touch layer enable کریں */
+        .player-content:not(.show-ui) #touchLayer {
+            pointer-events: auto;
+        }
 
-.p-bar { 
-    width: 100%; 
-    height: 5px; 
-    background: rgba(255,255,255,0.2); 
-    cursor: pointer; 
-    border-radius: 5px; 
-    margin-bottom: 12px; 
-    position: relative;
-    z-index: 7;
-}
+        /* UI CONTROLS - FIXED WITH BLACK CONTAINER */
+        .bottom-ui { 
+            position: absolute; 
+            bottom: 0;
+            left: 0; 
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, rgba(0,0,0,0) 100%);
+            padding: 15px 15px 10px 15px; 
+            z-index: 15; /* Touch layer سے اوپر */
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(5px);
+            pointer-events: auto !important;
+        }
 
-.p-fill { 
-    height: 100%; 
-    background: linear-gradient(to right, var(--pink), var(--neon-blue)); 
-    width: 0%; 
-    box-shadow: 0 0 8px var(--pink); 
-    border-radius: 5px;
-    position: relative;
-    z-index: 8;
-}
+        .player-content.show-ui .bottom-ui { 
+            opacity: 1; 
+            pointer-events: auto;
+        }
 
-/* Progress Bar Buffer */
-.p-buffer {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    background: rgba(255,255,255,0.1);
-    width: 0%;
-    border-radius: 5px;
-    z-index: 6;
-}
+        .player-content.hide-controls .bottom-ui {
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
 
-/* Controls Container */
-.controls-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-}
+        .p-bar { 
+            width: 100%; 
+            height: 5px; 
+            background: rgba(255,255,255,0.2); 
+            cursor: pointer; 
+            border-radius: 5px; 
+            margin-bottom: 12px; 
+            position: relative;
+            z-index: 16;
+            pointer-events: auto !important;
+        }
 
-/* Left Controls Group */
-.left-controls {
-    display: flex;
-    gap: 15px;
-    align-items: center;
-}
+        .p-fill { 
+            height: 100%; 
+            background: linear-gradient(to right, var(--pink), var(--neon-blue)); 
+            width: 0%; 
+            box-shadow: 0 0 8px var(--pink); 
+            border-radius: 5px;
+            position: relative;
+            z-index: 17;
+        }
 
-/* Control Buttons */
-.control-btn {
-    background: rgba(0,0,0,0.5);
-    border: 1px solid rgba(255,255,255,0.2);
-    color: white;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    transition: all 0.3s ease;
-}
+        /* Controls Container */
+        .controls-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            pointer-events: auto !important;
+        }
 
-.control-btn:hover {
-    background: rgba(0,0,0,0.8);
-    border-color: var(--neon-blue);
-    transform: scale(1.1);
-}
+        /* Left Controls Group */
+        .left-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            pointer-events: auto !important;
+        }
 
-/* Play/Pause Button Special */
-.play-pause-btn {
-    background: linear-gradient(45deg, var(--primary), var(--pink));
-    border: none;
-    width: 40px;
-    height: 40px;
-}
+        /* Control Buttons */
+        .control-btn {
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            pointer-events: auto !important;
+        }
 
-.play-pause-btn:hover {
-    background: linear-gradient(45deg, var(--pink), var(--primary));
-    box-shadow: 0 0 15px rgba(255, 65, 108, 0.5);
-}
+        .control-btn:hover {
+            background: rgba(0,0,0,0.8);
+            border-color: var(--neon-blue);
+            transform: scale(1.1);
+        }
 
-/* Time Display */
-.time-display {
-    font-size: 12px;
-    color: rgba(255,255,255,0.8);
-    font-family: monospace;
-    min-width: 100px;
-    text-align: center;
-    background: rgba(0,0,0,0.3);
-    padding: 4px 8px;
-    border-radius: 4px;
-}
+        /* Play/Pause Button Special */
+        .play-pause-btn {
+            background: linear-gradient(45deg, var(--primary), var(--pink));
+            border: none;
+            width: 40px;
+            height: 40px;
+        }
 
-/* Right Controls Group */
-.right-controls {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-}
+        .play-pause-btn:hover {
+            background: linear-gradient(45deg, var(--pink), var(--primary));
+            box-shadow: 0 0 15px rgba(255, 65, 108, 0.5);
+        }
 
-/* Volume Control */
-.volume-control {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
+        /* Time Display */
+        .time-display {
+            font-size: 12px;
+            color: rgba(255,255,255,0.8);
+            font-family: monospace;
+            min-width: 100px;
+            text-align: center;
+            background: rgba(0,0,0,0.3);
+            padding: 4px 8px;
+            border-radius: 4px;
+            pointer-events: none;
+        }
 
-.volume-slider {
-    width: 80px;
-    height: 4px;
-    background: rgba(255,255,255,0.2);
-    border-radius: 2px;
-    cursor: pointer;
-    position: relative;
-}
+        /* Right Controls Group */
+        .right-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            pointer-events: auto !important;
+        }
 
-.volume-fill {
-    height: 100%;
-    background: var(--neon-blue);
-    width: 80%;
-    border-radius: 2px;
-}
+        /* Volume Control */
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            pointer-events: auto !important;
+        }
 
-/* Fullscreen Button */
-.fullscreen-btn {
-    background: rgba(0,0,0,0.5);
-    border: 1px solid rgba(255,255,255,0.2);
-    color: white;
-    width: 32px;
-    height: 32px;
-    border-radius: 4px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    transition: all 0.3s ease;
-}
+        .volume-slider {
+            width: 80px;
+            height: 4px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 2px;
+            cursor: pointer;
+            position: relative;
+            pointer-events: auto !important;
+        }
 
-.fullscreen-btn:hover {
-    background: rgba(0,0,0,0.8);
-    border-color: var(--neon-blue);
-}
+        .volume-fill {
+            height: 100%;
+            background: var(--neon-blue);
+            width: 80%;
+            border-radius: 2px;
+        }
 
-/* CENTER CONTROLS - SKIP BUTTONS */
-.center-controls {
-    position: absolute; 
-    top: 50%; 
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: flex !important;
-    gap: 120px !important;
-    z-index: 160; 
-    opacity: 0;
-    transition: opacity 0.3s ease !important;
-}
+        /* Fullscreen Button */
+        .fullscreen-btn {
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            pointer-events: auto !important;
+        }
 
-.player-content.show-ui .center-controls { 
-    opacity: 1; 
-    pointer-events: auto; 
-}
+        .fullscreen-btn:hover {
+            background: rgba(0,0,0,0.8);
+            border-color: var(--neon-blue);
+        }
 
-.player-content.hide-controls .center-controls {
-    opacity: 0 !important;
-    pointer-events: none !important;
-}
+        
 
-.skip-btn {
-    background: rgba(0,0,0,0.7); 
-    border: 2px solid var(--neon-blue);
-    color: white; 
-    width: 60px; 
-    height: 60px; 
-    border-radius: 50%;
-    cursor: pointer; 
-    display: flex; 
-    flex-direction: column;
-    align-items: center; 
-    justify-content: center; 
-    font-size: 12px;
-    box-shadow: 0 0 15px rgba(0, 243, 255, 0.5);
-    transition: all 0.3s ease;
-}
+        .skip-btn {
+            background: rgba(0,0,0,0.7); 
+            border: 2px solid var(--neon-blue);
+            color: white; 
+            width: 60px; 
+            height: 60px; 
+            border-radius: 50%;
+            cursor: pointer; 
+            display: flex; 
+            flex-direction: column;
+            align-items: center; 
+            justify-content: center; 
+            font-size: 12px;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.5);
+            transition: all 0.3s ease;
+            pointer-events: auto !important;
+        }
 
-.skip-btn:hover {
-    background: rgba(0,0,0,0.9);
-    border-color: var(--neon-purple);
-    box-shadow: 0 0 25px rgba(0, 243, 255, 0.8);
-    transform: scale(1.1);
-}
+        .skip-btn:hover {
+            background: rgba(0,0,0,0.9);
+            border-color: var(--neon-purple);
+            box-shadow: 0 0 25px rgba(0, 243, 255, 0.8);
+            transform: scale(1.1);
+        }
 
-.skip-btn span {
-    font-size: 24px;
-    margin-bottom: 5px;
-}
+        .skip-btn span {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
 
-/* NEON LOADER */
-#bufferingScreen {
-    position: absolute; 
-    top: 0; 
-    left: 0; 
-    width: 100%; 
-    height: 100%;
-    background: black;
-    z-index: 10;
-    display: none; 
-    flex-direction: column; 
-    align-items: center; 
-    justify-content: center;
-}
+        /* Fixed Back Button */
+        .fixed-back-button {
+            position: fixed;
+            left: 20px;
+            bottom: 20px;
+            background: linear-gradient(45deg, var(--primary), var(--pink));
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 2000;
+            box-shadow: 0 4px 15px rgba(139, 0, 0, 0.5);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-.neon-loader {
-    width: 60px; 
-    height: 60px;
-    border: 5px solid transparent; 
-    border-top: 5px solid var(--pink);
-    border-bottom: 5px solid var(--neon-blue);
-    border-radius: 50%; 
-    animation: spinNeon 1s linear infinite;
-    box-shadow: 0 0 20px rgba(255, 65, 108, 0.5);
-}
+        .fixed-back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(139, 0, 0, 0.7);
+        }
 
-.loading-text {
-    margin-top: 15px;
-    color: var(--neon-blue);
-    font-size: 18px;
-    font-weight: bold;
-    text-shadow: 0 0 10px var(--neon-blue);
-    animation: textGlow 2s infinite alternate;
-}
+        /* Scroll to Top Button */
+        .scroll-top-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(45deg, var(--primary), var(--pink));
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 2000;
+            box-shadow: 0 4px 15px rgba(139, 0, 0, 0.5);
+            transition: var(--transition);
+            font-size: 20px;
+        }
 
-@keyframes spinNeon { 
-    0% { 
-        transform: rotate(0deg); 
-        border-top-color: var(--pink);
-        border-bottom-color: var(--neon-blue);
-    }
-    50% { 
-        border-top-color: var(--neon-blue);
-        border-bottom-color: var(--neon-purple);
-    }
-    100% { 
-        transform: rotate(360deg); 
-        border-top-color: var(--pink);
-        border-bottom-color: var(--neon-blue);
-    }
-}
+        .scroll-top-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(139, 0, 0, 0.7);
+        }
 
-@keyframes textGlow {
-    0% { 
-        color: var(--neon-blue);
-        text-shadow: 0 0 5px var(--neon-blue);
-    }
-    100% { 
-        color: var(--neon-purple);
-        text-shadow: 0 0 15px var(--neon-purple);
-    }
-}
+        /* Footer */
+        footer {
+            background: #1a1a1a;
+            padding: 20px 0;
+            margin-top: 40px;
+            border-top: 1px solid #333;
+        }
 
-/* Touch Layer for Interaction */
-#touchLayer {
-    position: absolute;
-    inset: 0;
-    z-index: 5;
-    cursor: pointer;
-}
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
 
-/* Responsive Controls */
-@media (max-width: 768px) {
-    .bottom-ui {
-        padding: 12px 10px 8px 10px;
-    }
-    
-    .control-btn {
-        width: 32px;
-        height: 32px;
-        font-size: 12px;
-    }
-    
-    .play-pause-btn {
-        width: 36px;
-        height: 36px;
-    }
-    
-    .time-display {
-        font-size: 11px;
-        min-width: 80px;
-    }
-    
-    .volume-slider {
-        width: 60px;
-    }
-    
-    .fullscreen-btn {
-        width: 30px;
-        height: 30px;
-        font-size: 14px;
-    }
-    
-    .center-controls {
-        gap: 80px;
-    }
-    
-    .skip-btn {
-        width: 50px;
-        height: 50px;
-        font-size: 10px;
-    }
-    
-    .skip-btn span {
-        font-size: 20px;
-    }
-}
+        .footer-links {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
 
-@media (max-width: 480px) {
-    .bottom-ui {
-        padding: 10px 8px 6px 8px;
-    }
-    
-    .control-btn {
-        width: 28px;
-        height: 28px;
-        font-size: 11px;
-    }
-    
-    .play-pause-btn {
-        width: 32px;
-        height: 32px;
-    }
-    
-    .time-display {
-        font-size: 10px;
-        min-width: 70px;
-        padding: 3px 6px;
-    }
-    
-    .volume-slider {
-        width: 40px;
-    }
-    
-    .fullscreen-btn {
-        width: 28px;
-        height: 28px;
-        font-size: 13px;
-    }
-    
-    .center-controls {
-        gap: 60px;
-    }
-    
-    .skip-btn {
-        width: 45px;
-        height: 45px;
-        font-size: 9px;
-    }
-    
-    .skip-btn span {
-        font-size: 18px;
-    }
-    
-    /* Hide volume on very small screens */
-    .volume-control {
-        display: none;
-    }
+        .footer-links a {
+            color: var(--secondary);
+            text-decoration: none;
+            transition: var(--transition);
+        }
 
+        .footer-links a:hover {
+            color: var(--golden);
+        }
+
+        .copyright {
+            color: #888;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .bottom-ui {
+                padding: 12px 10px 8px 10px;
+            }
             
+            .control-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 12px;
+            }
             
+            .play-pause-btn {
+                width: 36px;
+                height: 36px;
+            }
             
+            .time-display {
+                font-size: 11px;
+                min-width: 80px;
+            }
             
+            .volume-slider {
+                width: 60px;
+            }
             
+            .fullscreen-btn {
+                width: 30px;
+                height: 30px;
+                font-size: 14px;
+            }
             
+            .center-controls {
+                gap: 80px;
+            }
             
+            .skip-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 10px;
+            }
             
-            
-            
-            
-            
+            .skip-btn span {
+                font-size: 20px;
+            }
             
             .episode-button {
                 padding: 15px 20px;
@@ -735,7 +685,7 @@ body.player-open .main-content {
             }
             
             :root {
-                --player-fixed-height: 240px;
+                --player-fixed-height: 290px;
             }
         }
 
@@ -794,14 +744,17 @@ body.player-open .main-content {
                 font-size: 12px;
             }
             
-            :root {
-                --player-fixed-height: 200px;
+            .footer-links {
+                gap: 10px;
+                font-size: 14px;
             }
-        }
-
-        @media (min-width: 768px) { 
-            :root { 
-                --player-fixed-height: 280px;
+            
+            .copyright {
+                font-size: 12px;
+            }
+            
+            :root {
+                --player-fixed-height: 285px;
             }
         }
 
@@ -832,12 +785,12 @@ body.player-open .main-content {
     </main>
 
     <!-- Fixed Back Button -->
-    <button class="fixed-back-button" id="fixedBackButton" style="display: none;" onclick="goBackToDramas()">
+    <button class="fixed-back-button" id="fixedBackButton" style="display: none;">
         ← All Dramas
     </button>
 
     <!-- Scroll to Top Button -->
-    <div class="scroll-top-btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑</div>
+    <div class="scroll-top-btn">↑</div>
 
     <!-- FOOTER -->
     <footer>
@@ -854,6 +807,7 @@ body.player-open .main-content {
         </div>
     </footer>
 
+    // Replace the entire JavaScript section with this updated version
 
 <script>
     // YouTube DRAMA DATA
@@ -875,7 +829,7 @@ body.player-open .main-content {
             reverseOrder: false
         },
         {
-            title: "AAFAT ",
+            title: "AAFAT",
             image: "https://i.ytimg.com/vi/NwxLXyBzKJg/mqdefault.jpg",
             playlistId: 'PLdZNFVCDo_1cwI--XKu2tRTkgQ5XSK-eM',
             episodeCount: 80,
@@ -892,21 +846,25 @@ body.player-open .main-content {
     let playerReady = false;
     let currentPage = 'dramas';
     let isAdPlaying = false;
-    let posterVisible = true;
+    let controlsVisible = true; // Track controls visibility state
 
+    // Browser back button setup
     function setupBrowserBackButton() {
         window.addEventListener('popstate', function() {
             if (currentPage === 'episodes') goBackToDramas();
         });
+        
         function pushHistoryState() {
             let state = (currentPage === 'episodes') ? { page: 'episodes' } : { page: 'dramas' };
             let hash = (currentPage === 'episodes') ? '#episodes' : '#';
             history.pushState(state, '', hash);
         }
+        
         history.replaceState({ page: 'dramas' }, '', '#');
         return pushHistoryState;
     }
 
+    // Render dramas list
     function renderDramas(dramaList) {
         currentPage = 'dramas';
         const dramaGrid = document.getElementById('dramaGrid');
@@ -917,16 +875,25 @@ body.player-open .main-content {
         document.getElementById('fixedBackButton').style.display = 'none';
         dramaGrid.style.display = 'grid';
         document.body.classList.remove('player-open');
-        if (player) { try { player.destroy(); player = null; } catch (e) {} }
+        
+        if (player) { 
+            try { 
+                player.destroy(); 
+                player = null; 
+            } catch (e) {
+                console.error('Error destroying player:', e);
+            } 
+        }
+        
         isAdPlaying = false;
-        posterVisible = true;
+        controlsVisible = true; // Reset controls visibility
 
         dramaList.forEach((drama, index) => {
             const dramaCard = document.createElement('div');
             dramaCard.className = 'drama-card';
             dramaCard.innerHTML = `
                 <div class="drama-image-container">
-                    <img src="${drama.image}" alt="${drama.title}" class="drama-image">
+                    <img src="${drama.image}" alt="${drama.title}" class="drama-image" loading="lazy">
                     <div class="image-overlay"><div class="watch-text">Watch ${drama.episodeCount} Episodes</div></div>
                 </div>
                 <div class="drama-info">
@@ -937,9 +904,11 @@ body.player-open .main-content {
             dramaCard.onclick = () => openDramaEpisodes(index);
             dramaGrid.appendChild(dramaCard);
         });
+        
         if (window.pushHistoryState) window.pushHistoryState();
     }
 
+    // Open drama episodes
     function openDramaEpisodes(dramaIndex) {
         currentPage = 'episodes';
         currentDramaIndex = dramaIndex;
@@ -948,34 +917,40 @@ body.player-open .main-content {
         document.getElementById('dramaGrid').style.display = 'none';
         document.getElementById('fixedBackButton').style.display = 'flex';
         document.body.classList.add('player-open');
+        controlsVisible = true; // Make controls visible when player opens
 
         const playerContainer = document.getElementById('playerContainer');
         playerContainer.innerHTML = `
             <div class="player-box" id="playerBox" style="display: block;">
-                <div class="player-content" id="playerArea" onclick="handleUIInteraction()">
+                <div class="player-content show-ui" id="playerArea">
                     <div class="yt-iframe-wrapper" id="ytWrapper">
                         <div id="youtube-player"></div>
                     </div>
                     <img src="${drama.image}" class="drama-player-image" id="dramaPlayerImage" style="display: block;">
-                    <div id="bufferingScreen">
-                        <div class="neon-loader"></div>
-                        <div class="loading-text">LOADING...</div>
-                    </div>
-                    <div class="center-controls">
-                        <button class="skip-btn" onclick="skip(-10); event.stopPropagation();"><span>↺</span>10s</button>
-                        <button class="skip-btn" onclick="skip(10); event.stopPropagation();"><span>↻</span>10s</button>
-                    </div>
+                    
+                    <!-- Touch Layer - Click to toggle controls -->
+                    <div id="touchLayer" onclick="handleTouchLayerClick()"></div>
+                    
+                    <!-- Bottom Controls -->
                     <div class="bottom-ui" onclick="event.stopPropagation()">
-                        <div class="p-bar" onclick="seek(event)"><div class="p-fill" id="pFill"></div></div>
+                        <div class="p-bar" onclick="seek(event)">
+                            <div class="p-fill" id="pFill"></div>
+                        </div>
                         <div class="controls-container">
                             <div class="left-controls">
-                                <button class="control-btn" onclick="prevEp()">⏮</button>
-                                <button class="control-btn play-pause-btn" onclick="playPause()" id="playIcon">▶</button>
-                                <button class="control-btn" onclick="nextEp()">⏭</button>
-                                <div class="time-display"><span id="currTime">0:00</span> / <span id="totalTime">0:00</span></div>
+                                <button class="skip-btn" onclick="skip(-10); event.stopPropagation()">
+                                    <span>↺</span>10s
+                                </button>
+                                <button class="control-btn play-pause-btn" onclick="handlePlayPauseClick(); event.stopPropagation()" id="playIcon">▶</button>
+                                <button class="skip-btn" onclick="skip(10); event.stopPropagation()">
+                                    <span>↻</span>10s
+                                </button>
+                                <div class="time-display">
+                                    <span id="currTime">0:00</span> / <span id="totalTime">0:00</span>
+                                </div>
                             </div>
                             <div class="right-controls">
-                                <button class="fullscreen-btn" onclick="toggleFullscreen()">⛶</button>
+                                <button class="fullscreen-btn" onclick="toggleFullscreen(); event.stopPropagation()">⛶</button>
                             </div>
                         </div>
                     </div>
@@ -983,22 +958,33 @@ body.player-open .main-content {
             </div>
         `;
 
-        const episodesGrid = document.createElement('div');
-        episodesGrid.className = 'episodes-grid';
-        document.getElementById('episodesContainer').appendChild(episodesGrid);
+        // Setup back button
+        document.getElementById('fixedBackButton').onclick = goBackToDramas;
+        
+        // Setup scroll to top button
+        document.querySelector('.scroll-top-btn').onclick = () => window.scrollTo({top: 0, behavior: 'smooth'});
+
+        // Render episodes
+        const episodesContainer = document.getElementById('episodesContainer');
+        episodesContainer.innerHTML = `<div class="episodes-grid" id="episodesGrid"></div>`;
+        const episodesGrid = document.getElementById('episodesGrid');
         
         for (let i = 0; i < drama.episodeCount; i++) {
             const btn = document.createElement('button');
             btn.className = 'episode-button';
             btn.id = `ep-button-${i}`;
             btn.innerHTML = `Episode ${i + 1}`;
-            btn.onclick = (e) => { e.stopPropagation(); openPlayer(i); };
+            btn.onclick = (e) => { 
+                e.stopPropagation(); 
+                openPlayer(i); 
+            };
             episodesGrid.appendChild(btn);
         }
 
         loadYouTubeAPI();
     }
 
+    // Load YouTube API
     function loadYouTubeAPI() {
         if (window.YT && window.YT.Player) {
             initializePlayer();
@@ -1010,50 +996,70 @@ body.player-open .main-content {
         }
     }
 
+    // Initialize YouTube player
     function initializePlayer() {
-        if (player) player.destroy();
+        if (player) {
+            try {
+                player.destroy();
+            } catch (e) {
+                console.error('Error destroying existing player:', e);
+            }
+        }
+        
         player = new YT.Player('youtube-player', {
-            height: '100%', width: '100%',
-            playerVars: { 'autoplay': 0, 'controls': 0, 'modestbranding': 1, 'rel': 0, 'playsinline': 1, 'enablejsapi': 1 },
+            height: '100%', 
+            width: '100%',
+            playerVars: { 
+                'autoplay': 0, 
+                'controls': 0,           // YouTube کنٹرولز کو ہائیڈ کریں
+                'modestbranding': 1, 
+                'rel': 0, 
+                'playsinline': 1, 
+                'enablejsapi': 1,
+                'fs': 0,                 // YouTube fullscreen button ہائیڈ
+                'showinfo': 0,           // معلومات ہائیڈ
+                'iv_load_policy': 3,     // annotations ہائیڈ
+                'disablekb': 1,          // کی بورڈ کنٹرولز ڈس ایبل
+                'autohide': 2,           // کنٹرولز آٹو ہائیڈ
+                'cc_load_policy': 0,     // سب ٹائٹلز ہائیڈ
+                'widget_referrer': 1,    // ریفرر معلومات ہائیڈ
+            },
             events: { 
                 'onReady': onPlayerReady, 
                 'onStateChange': onPlayerStateChange 
             }
         });
         
-        // ✅ NEW: Continuous check for loader removal
-        setInterval(() => {
-            if (player && typeof player.getPlayerState === 'function') {
-                const state = player.getPlayerState();
-                const loader = document.getElementById('bufferingScreen');
-                // Agar video play ho rahi hai (even ads), loader ko hamesha hide rakhein
-                if (state === YT.PlayerState.PLAYING && loader && loader.style.display !== 'none') {
-                    loader.style.display = 'none';
-                    console.log("Force Hiding Loader");
-                }
-            }
-        }, 500);
-
         setInterval(updateProgress, 500);
     }
 
+    // Player ready callback
     function onPlayerReady() {
         playerReady = true;
-        document.getElementById('bufferingScreen').style.display = 'none';
+        console.log('YouTube Player is ready');
+        
+        // Ensure controls are visible when player is ready
+        const playerArea = document.getElementById('playerArea');
+        if (playerArea) {
+            playerArea.classList.add('show-ui');
+        }
+        controlsVisible = true;
     }
 
+    // Open specific episode
     function openPlayer(userEpisodeIndex) {
-        if (!player || !playerReady) return;
+        if (!player || !playerReady) {
+            console.error('Player not ready');
+            return;
+        }
+        
         const drama = dramas[currentDramaIndex];
         currentUserEpisodeIndex = userEpisodeIndex;
         let playlistIndex = drama.reverseOrder ? (drama.episodeCount - 1 - userEpisodeIndex) : userEpisodeIndex;
 
-        // ✅ Immediate Hide Image & Show Loader
+        // Episode click karte hi Image foran hide hogi
         const dramaImage = document.getElementById('dramaPlayerImage');
-        const loader = document.getElementById('bufferingScreen');
         if (dramaImage) dramaImage.style.display = 'none';
-        if (loader) loader.style.display = 'flex';
-        posterVisible = false;
 
         player.loadPlaylist({
             list: currentPlaylistId,
@@ -1061,12 +1067,16 @@ body.player-open .main-content {
             index: playlistIndex
         });
 
+        // Update active episode button
         document.querySelectorAll('.episode-button').forEach(el => el.classList.remove('active'));
         document.getElementById(`ep-button-${userEpisodeIndex}`)?.classList.add('active');
+        
+        // Show controls when switching episodes
+        showControls();
     }
 
+    // Player state change callback
     function onPlayerStateChange(event) {
-        const loader = document.getElementById('bufferingScreen');
         const dramaImage = document.getElementById('dramaPlayerImage');
         const playIcon = document.getElementById('playIcon');
         const playerArea = document.getElementById('playerArea');
@@ -1075,68 +1085,139 @@ body.player-open .main-content {
         isAdPlaying = (videoData && (videoData.ad === 1 || videoData.title === "Advertisement" || videoData.isPlayable === false));
 
         if (event.data === YT.PlayerState.PLAYING) {
-            // ✅ Hide everything when video starts
-            if (loader) loader.style.display = 'none';
+            // Image hide rakhein jab video ya ad chal raha ho
             if (dramaImage) dramaImage.style.display = 'none';
             if (playIcon) playIcon.innerText = '||';
 
             if (isAdPlaying) {
+                // Ad کے دوران ہمیشہ controls دکھائیں
                 playerArea.setAttribute('data-ad-playing', 'true');
-                playerArea.classList.add('show-ui');
-                clearTimeout(hideTimeout);
+                showControls();
             } else {
                 playerArea.setAttribute('data-ad-playing', 'false');
-                resetHideTimer();
+                // Video playing - start auto-hide timer after 5 seconds
+                if (controlsVisible) {
+                    startAutoHideTimer();
+                }
             }
         } 
-        else if (event.data === YT.PlayerState.BUFFERING) {
-            if (!isAdPlaying && loader) loader.style.display = 'flex';
-        }
         else if (event.data === YT.PlayerState.PAUSED) {
             if (playIcon) playIcon.innerText = '▶';
-            if (loader) loader.style.display = 'none';
+            
+            // Pause par image tabhi dikhayen agar ad na ho
             if (!isAdPlaying && dramaImage) {
                 dramaImage.style.display = 'block';
-                posterVisible = true;
+            }
+            
+            // Pause ہونے پر controls دکھائیں اور auto-hide روکیں
+            showControls();
+            clearTimeout(hideTimeout);
+        }
+        else if (event.data === YT.PlayerState.ENDED) {
+            if (dramaImage) dramaImage.style.display = 'block';
+            if (playIcon) playIcon.innerText = '▶';
+            
+            // Video ختم ہونے پر controls دکھائیں
+            showControls();
+            clearTimeout(hideTimeout);
+        }
+    }
+
+    // Start auto-hide timer for controls
+    function startAutoHideTimer() {
+        clearTimeout(hideTimeout);
+        hideTimeout = setTimeout(() => {
+            if (!isAdPlaying && player && player.getPlayerState() === YT.PlayerState.PLAYING) {
+                hideControls();
+            }
+        }, 5000); // Hide after 5 seconds
+    }
+
+    // Show controls
+    function showControls() {
+        const playerArea = document.getElementById('playerArea');
+        if (playerArea) {
+            playerArea.classList.add('show-ui');
+            controlsVisible = true;
+        }
+    }
+
+    // Hide controls
+    function hideControls() {
+        const playerArea = document.getElementById('playerArea');
+        if (playerArea && !isAdPlaying) {
+            playerArea.classList.remove('show-ui');
+            controlsVisible = false;
+        }
+    }
+
+    // Toggle controls visibility
+    function toggleControls() {
+        if (isAdPlaying) {
+            // Ads کے دوران ہمیشہ controls دکھائیں
+            showControls();
+            return;
+        }
+        
+        if (controlsVisible) {
+            hideControls();
+        } else {
+            showControls();
+            
+            // If video is playing, start auto-hide timer
+            if (player && player.getPlayerState() === YT.PlayerState.PLAYING) {
+                startAutoHideTimer();
             }
         }
     }
 
-    function resetHideTimer() {
-        const playerArea = document.getElementById('playerArea');
-        if (!playerArea || isAdPlaying) return;
-        clearTimeout(hideTimeout);
-        playerArea.classList.add('show-ui');
-        hideTimeout = setTimeout(() => {
-            if (!isAdPlaying) playerArea.classList.remove('show-ui');
-        }, 3000);
+    // Touch layer click handler
+    function handleTouchLayerClick() {
+        toggleControls();
     }
 
-    function handleUIInteraction() {
+    // Play/Pause handler
+    function handlePlayPauseClick() {
         if (isAdPlaying) return;
-        const playerArea = document.getElementById('playerArea');
-        if (playerArea) {
-            playerArea.classList.toggle('show-ui');
-            if (playerArea.classList.contains('show-ui')) resetHideTimer();
+        
+        const state = player.getPlayerState();
+        const playIcon = document.getElementById('playIcon');
+        const dramaImage = document.getElementById('dramaPlayerImage');
+        
+        if (state === YT.PlayerState.PLAYING) {
+            player.pauseVideo();
+            if (playIcon) playIcon.innerText = '▶';
+            if (dramaImage) dramaImage.style.display = 'block';
+        } else {
+            player.playVideo();
+            if (playIcon) playIcon.innerText = '||';
+            if (dramaImage) dramaImage.style.display = 'none';
         }
     }
 
-    function playPause() {
-        if (isAdPlaying) return;
-        const state = player.getPlayerState();
-        state === YT.PlayerState.PLAYING ? player.pauseVideo() : player.playVideo();
-    }
-
+    // Skip function
     function skip(seconds) {
         if (isAdPlaying) return;
-        player.seekTo(player.getCurrentTime() + seconds, true);
+        
+        const currentTime = player.getCurrentTime();
+        const newTime = currentTime + seconds;
+        
+        if (newTime < 0) {
+            player.seekTo(0, true);
+        } else if (newTime > player.getDuration()) {
+            nextEp();
+        } else {
+            player.seekTo(newTime, true);
+        }
     }
 
+    // Update progress bar
     function updateProgress() {
         if (player && player.getCurrentTime && !isAdPlaying) {
             const curr = player.getCurrentTime();
             const dur = player.getDuration();
             const pFill = document.getElementById('pFill');
+            
             if (dur > 0 && pFill) {
                 pFill.style.width = (curr / dur * 100) + '%';
                 document.getElementById('currTime').innerText = formatTime(curr);
@@ -1145,33 +1226,73 @@ body.player-open .main-content {
         }
     }
 
+    // Format time (MM:SS)
     function formatTime(s) {
         const m = Math.floor(s / 60);
         const r = Math.floor(s % 60);
         return m + ":" + (r < 10 ? '0' : '') + r;
     }
 
+    // Toggle fullscreen
     function toggleFullscreen() {
         const el = document.getElementById('playerArea');
-        if (!document.fullscreenElement) el.requestFullscreen();
-        else document.exitFullscreen();
+        if (!document.fullscreenElement) {
+            el.requestFullscreen().catch(err => {
+                console.error(`Error attempting to enable fullscreen: ${err.message}`);
+            });
+        } else {
+            document.exitFullscreen();
+        }
     }
 
+    // Seek function
+    function seek(event) {
+        if (!player || isAdPlaying) return;
+        
+        const pBar = event.currentTarget;
+        const rect = pBar.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const width = rect.width;
+        const percentage = x / width;
+        
+        const duration = player.getDuration();
+        const newTime = percentage * duration;
+        
+        player.seekTo(newTime, true);
+        event.stopPropagation();
+    }
+
+    // Next episode
     function nextEp() {
         const drama = dramas[currentDramaIndex];
-        if (currentUserEpisodeIndex < drama.episodeCount - 1) openPlayer(currentUserEpisodeIndex + 1);
+        if (currentUserEpisodeIndex < drama.episodeCount - 1) {
+            openPlayer(currentUserEpisodeIndex + 1);
+        }
     }
 
+    // Previous episode
     function prevEp() {
-        if (currentUserEpisodeIndex > 0) openPlayer(currentUserEpisodeIndex - 1);
+        if (currentUserEpisodeIndex > 0) {
+            openPlayer(currentUserEpisodeIndex - 1);
+        }
     }
 
+    // Go back to dramas list
     function goBackToDramas() {
-        if (player) { try { player.destroy(); } catch(e){} player = null; }
+        if (player) { 
+            try { 
+                player.destroy(); 
+            } catch(e) {
+                console.error('Error destroying player:', e);
+            } 
+            player = null; 
+        }
+        
         renderDramas(dramas);
-        window.scrollTo(0,0);
+        window.scrollTo({top: 0, behavior: 'smooth'});
     }
 
+    // Initialize on page load
     document.addEventListener('DOMContentLoaded', () => {
         window.pushHistoryState = setupBrowserBackButton();
         renderDramas(dramas);
