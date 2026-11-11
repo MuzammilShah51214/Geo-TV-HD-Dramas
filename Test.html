@@ -1,0 +1,1910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ARY Serials • Premium Player</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root {
+  --bg-primary: #08080c;
+  --bg-secondary: #0f0f17;
+  --bg-card: rgba(255,255,255,0.03);
+  --bg-card-hover: rgba(255,255,255,0.06);
+  --border: rgba(255,255,255,0.08);
+  --border-hover: rgba(255,255,255,0.15);
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255,255,255,0.65);
+  --text-muted: rgba(255,255,255,0.4);
+  --accent-1: #00ffff;
+  --accent-2: #ff00cc;
+  --accent-3: #7c3aed;
+  --glow-cyan: rgba(0,255,255,0.4);
+  --glow-pink: rgba(255,0,204,0.4);
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --transition: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-theme="light"] {
+  --bg-primary: #f5f5f7;
+  --bg-secondary: #ffffff;
+  --bg-card: rgba(0,0,0,0.02);
+  --bg-card-hover: rgba(0,0,0,0.05);
+  --border: rgba(0,0,0,0.08);
+  --border-hover: rgba(0,0,0,0.15);
+  --text-primary: #0a0a0f;
+  --text-secondary: rgba(0,0,0,0.7);
+  --text-muted: rgba(0,0,0,0.5);
+  --accent-1: #0891b2;
+  --accent-2: #db2777;
+  --accent-3: #7c3aed;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg-primary);
+  min-height: 100vh;
+  font-family: 'Inter', -apple-system, sans-serif;
+  color: var(--text-primary);
+  overflow-x: hidden;
+  transition: background 0.4s var(--transition);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+body::before, body::after {
+  content: ''; position: fixed; border-radius: 50%;
+  filter: blur(120px); opacity: 0.25;
+  pointer-events: none; z-index: 0;
+}
+body::before {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, var(--accent-1), transparent 70%);
+  top: -150px; left: -150px;
+  animation: float1 20s ease-in-out infinite;
+}
+body::after {
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, var(--accent-2), transparent 70%);
+  bottom: -200px; right: -200px;
+  animation: float2 25s ease-in-out infinite;
+}
+@keyframes float1 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(100px,100px) scale(1.2); } }
+@keyframes float2 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-100px,-100px) scale(1.15); } }
+
+/* Header */
+.page-header {
+  position: sticky; top: 0; z-index: 50;
+  width: 100%;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  background: color-mix(in srgb, var(--bg-primary) 75%, transparent);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 20px;
+  display: flex; align-items: center; gap: 14px;
+  transition: all 0.3s var(--transition);
+}
+
+.page-header.hidden { display: none !important; }
+
+.header-inner {
+  max-width: 1100px; margin: 0 auto; width: 100%;
+  display: flex; align-items: center; gap: 14px;
+}
+.back-btn {
+  background: var(--bg-card); border: 1px solid var(--border);
+  color: var(--text-primary); padding: 9px 16px;
+  border-radius: 999px; cursor: pointer;
+  font-weight: 600; font-size: 13px;
+  display: none; align-items: center; gap: 8px;
+  transition: all 0.25s var(--transition);
+  backdrop-filter: blur(10px);
+}
+.back-btn:hover {
+  border-color: var(--accent-1); color: var(--accent-1);
+  transform: translateX(-2px); box-shadow: 0 0 20px var(--glow-cyan);
+}
+.back-btn.show { display: flex; }
+
+.brand { display: flex; align-items: center; gap: 10px; flex: 1; }
+.brand-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+  display: grid; place-items: center;
+  font-size: 16px; color: #000;
+  box-shadow: 0 4px 20px var(--glow-pink);
+}
+.brand-text {
+  font-size: 17px; font-weight: 800; letter-spacing: -0.3px;
+  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.brand-sub { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+
+.theme-toggle {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: var(--bg-card); border: 1px solid var(--border);
+  color: var(--text-primary); cursor: pointer;
+  display: grid; place-items: center;
+  transition: all 0.3s var(--transition);
+}
+.theme-toggle:hover {
+  border-color: var(--accent-1); color: var(--accent-1);
+  transform: rotate(20deg); box-shadow: 0 0 20px var(--glow-cyan);
+}
+
+.main-wrap { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 0 20px; flex: 1; width: 100%; }
+
+/* Hero */
+.hero { padding: 40px 0 30px; text-align: center; animation: fadeInUp 0.6s var(--transition); }
+.hero h1 {
+  font-size: clamp(28px, 5vw, 42px); font-weight: 900;
+  letter-spacing: -1px; line-height: 1.1; margin-bottom: 12px;
+}
+.hero h1 span {
+  background: linear-gradient(135deg, var(--accent-1) 0%, var(--accent-2) 50%, var(--accent-3) 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.hero p { color: var(--text-secondary); font-size: 15px; max-width: 500px; margin: 0 auto; }
+
+/* Search */
+.search-wrap { max-width: 500px; margin: 24px auto 0; position: relative; }
+.search-wrap i {
+  position: absolute; left: 18px; top: 50%;
+  transform: translateY(-50%); color: var(--text-muted);
+  font-size: 14px; pointer-events: none;
+}
+#searchInput {
+  width: 100%; padding: 14px 18px 14px 46px;
+  border-radius: 999px; border: 1px solid var(--border);
+  background: var(--bg-card); color: var(--text-primary);
+  font-size: 14px; font-family: inherit; outline: none;
+  transition: all 0.3s var(--transition);
+  backdrop-filter: blur(10px);
+}
+#searchInput::placeholder { color: var(--text-muted); }
+#searchInput:focus {
+  border-color: var(--accent-1);
+  box-shadow: 0 0 0 3px rgba(0,255,255,0.1), 0 0 30px var(--glow-cyan);
+}
+
+/* Player section */
+#playerSection { display: none; width: 100%; animation: fadeInUp 0.5s var(--transition); }
+#playerSection.active { display: block; }
+
+/* Player card */
+.player-card {
+  width: 100%;
+  max-width: 1000px;
+  background: #000;
+  position: relative;
+  border-radius: 0;
+  margin: 0 auto;
+}
+@media (min-width: 768px) {
+  .player-card {
+    border-radius: 28px 28px 0 0;
+    margin-top: 10px;
+    box-shadow: 0 30px 50px -20px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05);
+  }
+}
+
+/* ✅ ORIGINAL WRAPPER */
+.yt-wrapper {
+  position: fixed;
+  width: 100%;
+  padding-bottom: 56.25%;
+  height: 400px;
+  background: #000;
+  overflow: hidden;
+  display: block;
+  top: -98px;
+  left: 0px;
+  z-index: 10;
+}
+
+/* ✅ BLACK CONTAINER BEHIND CONTROLS */
+.overlay {
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 100%; height: 59px;
+  background: #000000;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.click-capture {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 10;
+  cursor: pointer;
+  background: transparent;
+}
+
+/* Loader */
+.loader-container {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: #000000;
+  z-index: 25;
+  display: flex; justify-content: center; align-items: center;
+  transition: opacity 0.4s ease, visibility 0.4s ease;
+  visibility: hidden; opacity: 0;
+}
+.loader-container.active { visibility: visible; opacity: 1; }
+
+.modern-spinner { position: relative; width: 60px; height: 60px; }
+.modern-spinner div {
+  position: absolute; width: 100%; height: 100%;
+  border: 2px solid transparent; border-radius: 50%;
+  animation: rotate 1.2s cubic-bezier(0.5,0,0.5,1) infinite;
+}
+.modern-spinner div:nth-child(1) { border-top-color: var(--accent-1); border-bottom-color: var(--accent-1); animation-delay: -0.45s; }
+.modern-spinner div:nth-child(2) { border-left-color: var(--accent-2); border-right-color: var(--accent-2); animation-delay: -0.3s; }
+.modern-spinner div:nth-child(3) { border-top-color: #fff; animation-delay: -0.15s; }
+@keyframes rotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+/* ✅ CENTER PLAY */
+.center-play-overlay {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+  background-color: #000000;
+  z-index: 20;
+  display: flex; justify-content: center; align-items: center;
+  transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+.center-play-overlay.hidden { opacity: 0; visibility: hidden; }
+
+.poster-img {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+  object-fit: contain;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.big-play-btn {
+  width: 60px; height: 60px;
+  background: #ff00cc;
+  border-radius: 50%;
+  display: flex; justify-content: center; align-items: center;
+  cursor: pointer; border: none;
+  box-shadow: 0 0 15px #ff00cc, 0 0 30px rgba(255,0,204,0.4);
+  border: 2px solid #ff33d6;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative; z-index: 2;
+}
+.big-play-btn i {
+  color: #fff; font-size: 1.8rem; margin-left: 4px;
+  filter: drop-shadow(0 0 5px #fff);
+}
+.big-play-btn:active { transform: scale(0.9); box-shadow: 0 0 10px #ff00cc; }
+.big-play-btn:hover { transform: scale(1.05); }
+
+/* ✅ NEON CUSTOM CONTROLS */
+.custom-controls {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  display: flex; flex-direction: column;
+  padding: 12px 16px;
+  background: transparent;
+  z-index: 30;
+  transition: opacity 0.3s cubic-bezier(0.2,0.9,0.3,1), transform 0.3s;
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: none;
+}
+.custom-controls.hidden {
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+}
+.custom-controls > * { pointer-events: auto; }
+
+/* Progress */
+.progress-container {
+  width: 100%; margin-bottom: 8px;
+  display: flex; align-items: center; gap: 12px;
+}
+.time-current, .time-total {
+  font-size: 12px; font-weight: 600;
+  color: var(--accent-1);
+  text-shadow: 0 0 5px rgba(0,255,255,0.5);
+  min-width: 35px;
+  font-variant-numeric: tabular-nums;
+}
+.time-total { text-align: right; color: rgba(0,255,255,0.7); opacity: 0; transition: opacity 0.3s ease; }
+.time-total.show { opacity: 1; }
+
+.progress-bar {
+  flex: 1; height: 4px;
+  background: rgba(0,255,255,0.15);
+  border-radius: 10px; cursor: pointer;
+  position: relative; transition: height 0.15s;
+  box-shadow: inset 0 0 5px rgba(0,255,255,0.2);
+}
+.progress-bar:hover, .progress-bar:active { height: 6px; }
+
+.progress-buffered {
+  position: absolute; inset: 0;
+  width: 0%;
+  background: rgba(0,255,255,0.15);
+  border-radius: 10px;
+  pointer-events: none;
+}
+
+.progress-filled {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, #ff00cc, #00ffff);
+  border-radius: 10px;
+  transition: width 0.1s linear;
+  position: relative;
+  box-shadow: 0 0 10px #ff00cc, 0 0 20px #00ffff;
+}
+
+/* Buttons */
+.buttons-row { display: flex; align-items: center; justify-content: space-between; }
+.left-controls, .right-controls { display: flex; align-items: center; gap: 10px; }
+
+.ctrl-btn {
+  background: rgba(0,255,255,0.05);
+  border: 1px solid var(--accent-1);
+  color: var(--accent-1);
+  width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 0 8px rgba(0,255,255,0.3);
+}
+.ctrl-btn i { font-size: 0.9rem; filter: drop-shadow(0 0 5px var(--accent-1)); }
+.ctrl-btn:active { transform: scale(0.9); background: rgba(0,255,255,0.2); box-shadow: 0 0 15px rgba(0,255,255,0.6); }
+
+.play-pause-btn {
+  background: #ff00cc; color: #000;
+  width: 42px; height: 42px;
+  border: 1px solid #ff00cc;
+  box-shadow: 0 0 12px #ff00cc, 0 0 25px rgba(255,0,204,0.5);
+}
+.play-pause-btn i { color: #fff; font-size: 1.1rem; margin-left: 2px; filter: drop-shadow(0 0 3px #fff); }
+.play-pause-btn .fa-pause { margin-left: 0; }
+.play-pause-btn:active { transform: scale(0.9); background: #ff33d6; }
+
+/* Volume */
+.volume-wrap { display: flex; align-items: center; gap: 6px; }
+.volume-slider {
+  width: 0; opacity: 0;
+  transition: all 0.3s var(--transition);
+  height: 4px;
+  background: rgba(0,255,255,0.15);
+  border-radius: 10px; outline: none;
+  -webkit-appearance: none; cursor: pointer;
+}
+.volume-wrap:hover .volume-slider {
+  width: 70px; opacity: 1; margin-right: 8px;
+}
+.volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--accent-1);
+  box-shadow: 0 0 8px var(--accent-1);
+  cursor: pointer;
+}
+.volume-slider::-moz-range-thumb {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--accent-1);
+  border: none;
+  box-shadow: 0 0 8px var(--accent-1);
+  cursor: pointer;
+}
+
+/* Quality */
+.quality-wrapper { position: relative; }
+.quality-toggle-btn {
+  background: rgba(0,255,255,0.05);
+  border: 1px solid var(--accent-1);
+  border-radius: 40px;
+  padding: 4px 12px;
+  color: var(--accent-1);
+  font-size: 11px; font-weight: 600;
+  cursor: pointer; outline: none;
+  display: flex; align-items: center; gap: 6px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 0 8px rgba(0,255,255,0.2);
+  height: 34px;
+}
+.quality-toggle-btn i { font-size: 8px; filter: drop-shadow(0 0 5px var(--accent-1)); }
+
+.quality-menu {
+  position: absolute;
+  bottom: 45px; right: 0;
+  width: 90px; max-height: 120px;
+  overflow-y: auto;
+  background: rgba(10,10,10,0.95);
+  border: 1px solid var(--accent-1);
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0,255,255,0.4);
+  display: none; flex-direction: column;
+  z-index: 50;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.quality-menu::-webkit-scrollbar { width: 4px; }
+.quality-menu::-webkit-scrollbar-track { background: rgba(0,255,255,0.1); }
+.quality-menu::-webkit-scrollbar-thumb { background: var(--accent-1); border-radius: 4px; }
+.quality-menu.active { display: flex; }
+
+.quality-option {
+  padding: 8px;
+  font-size: 11px;
+  color: #fff;
+  text-align: center;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(0,255,255,0.1);
+  transition: all 0.2s;
+}
+.quality-option:last-child { border-bottom: none; }
+.quality-option:hover, .quality-option.active {
+  background: rgba(0,255,255,0.2);
+  color: var(--accent-1);
+  text-shadow: 0 0 5px var(--accent-1);
+}
+
+.fullscreen-btn {
+  background: rgba(255,0,204,0.05);
+  border-color: #ff00cc;
+  color: #ff00cc;
+  box-shadow: 0 0 8px rgba(255,0,204,0.3);
+  width: 34px; height: 34px;
+}
+.fullscreen-btn i { filter: drop-shadow(0 0 5px #ff00cc); font-size: 0.9rem; }
+.fullscreen-btn:active { background: rgba(255,0,204,0.2); box-shadow: 0 0 15px rgba(255,0,204,0.6); }
+
+/* ✅ AD MODE: Saare black overlays hide karo taake ad saaf nazar aaye */
+.yt-wrapper.ad-playing .loader-container,
+.yt-wrapper.ad-playing .center-play-overlay,
+.yt-wrapper.ad-playing .overlay,
+.yt-wrapper.ad-playing #ytPauseOverlay,
+.yt-wrapper.ad-playing .custom-controls {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Ad ke doran click-capture ko bhi disable karein taake YouTube ka "Skip Ad" clickable ho */
+.yt-wrapper.ad-playing .click-capture {
+  pointer-events: none !important;
+  z-index: -1 !important;
+}
+
+/* Ad ke doran wrapper ko zyada upar rakho taake YouTube UI (skip button) saaf dikhe */
+.yt-wrapper.ad-playing {
+  z-index: 15;
+}
+
+/* ✅ SPACER */
+.player-spacer {
+  height: 400px;
+  width: 100%;
+}
+
+/* Playlist grid */
+.playlist-section { padding: 30px 0 20px; animation: fadeInUp 0.5s var(--transition); }
+.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.section-title {
+  font-size: 20px; font-weight: 800;
+  letter-spacing: -0.5px;
+  display: flex; align-items: center; gap: 10px;
+}
+.section-title i { color: var(--accent-2); font-size: 18px; }
+.section-count {
+  font-size: 12px; color: var(--text-muted);
+  background: var(--bg-card); padding: 4px 10px;
+  border-radius: 999px; border: 1px solid var(--border);
+}
+
+.playlist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.playlist-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  overflow: hidden; cursor: pointer;
+  position: relative;
+  border: 1px solid var(--border);
+  transition: all 0.3s var(--transition);
+  display: flex; flex-direction: column;
+  animation: fadeInUp 0.5s var(--transition) backwards;
+}
+.playlist-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent-1);
+  box-shadow: 0 20px 40px -15px rgba(0,0,0,0.6), 0 0 30px -5px var(--glow-cyan);
+  background: var(--bg-card-hover);
+}
+
+.playlist-thumb {
+  position: relative; overflow: hidden;
+  aspect-ratio: 16/9; background: #111;
+}
+.playlist-thumb img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s var(--transition);
+}
+.playlist-card:hover .playlist-thumb img { transform: scale(1.08); }
+
+.playlist-thumb::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.6), transparent 50%);
+  opacity: 0; transition: opacity 0.3s;
+}
+.playlist-card:hover .playlist-thumb::after { opacity: 1; }
+
+.play-badge {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%) scale(0.6);
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-2), var(--accent-3));
+  display: grid; place-items: center;
+  opacity: 0;
+  transition: all 0.3s var(--transition);
+  z-index: 2;
+  box-shadow: 0 0 30px var(--glow-pink);
+}
+.playlist-card:hover .play-badge {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+.play-badge i { color: #fff; font-size: 20px; margin-left: 3px; }
+
+.playlist-card-title {
+  padding: 12px 14px;
+  font-size: 13px; font-weight: 600;
+  color: var(--text-primary); line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden; min-height: 50px;
+}
+
+/* Episodes */
+.episodes-section { padding: 0 0 20px; animation: fadeInUp 0.5s var(--transition); }
+.episodes-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media (min-width: 768px) {
+  .episodes-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+.episode-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  overflow: hidden; cursor: pointer;
+  border: 1px solid var(--border);
+  transition: all 0.25s var(--transition);
+  animation: fadeInUp 0.4s var(--transition) backwards;
+  display: flex; flex-direction: column;
+}
+.episode-card:hover {
+  border-color: var(--accent-1);
+  transform: translateY(-2px);
+  box-shadow: 0 15px 30px -10px rgba(0,0,0,0.5), 0 0 25px -10px var(--glow-cyan);
+}
+.episode-card.active {
+  border-color: var(--accent-2);
+  box-shadow: 0 0 0 2px var(--accent-2), 0 15px 30px -10px var(--glow-pink);
+}
+
+.episode-thumb {
+  position: relative; aspect-ratio: 16/9;
+  overflow: hidden; background: #111;
+}
+.episode-thumb img {
+  width: 100%; height: 100%;
+  object-fit: cover; transition: transform 0.3s;
+}
+.episode-card:hover .episode-thumb img { transform: scale(1.05); }
+
+.episode-title {
+  padding: 10px 12px;
+  font-size: 12px; font-weight: 600;
+  color: var(--text-primary); line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden; min-height: 48px;
+}
+
+
+.episode-thumb {
+  position: relative;
+}
+.watching-overlay {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+/* Jab episode active/playing ho toh watching badge show hoga */
+.episode-card.active .watching-overlay {
+  opacity: 1;
+}
+
+
+
+
+/* Skeleton */
+.skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+.skeleton-card {
+  aspect-ratio: 16/9;
+  border-radius: var(--radius-md);
+  background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-card-hover) 50%, var(--bg-card) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border: 1px solid var(--border);
+}
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Empty */
+.empty-state {
+  grid-column: 1 / -1;
+  padding: 60px 20px;
+  text-align: center;
+  color: var(--text-muted);
+}
+.empty-state i { font-size: 48px; margin-bottom: 16px; opacity: 0.4; }
+.empty-state h3 { font-size: 16px; color: var(--text-secondary); margin-bottom: 6px; }
+.empty-state p { font-size: 13px; }
+
+/* ✅ PAGINATION BUTTONS */
+.pagination-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 30px;
+  margin-bottom: 40px;
+}
+.page-info {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 5px;
+}
+.pagination-btns {
+  display: flex;
+  gap: 12px;
+}
+.pagination-btn {
+  background: linear-gradient(135deg, var(--accent-2), var(--accent-3));
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s var(--transition);
+  box-shadow: 0 8px 20px -5px var(--glow-pink);
+}
+.pagination-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 25px -5px var(--glow-pink);
+}
+.pagination-btn:active {
+  transform: scale(0.95);
+}
+.pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* FAB */
+.floating-all-dramas {
+  position: fixed; bottom: 24px; left: 24px;
+  background: linear-gradient(135deg, var(--accent-2), var(--accent-3));
+  color: #fff; padding: 12px 20px;
+  border-radius: 999px;
+  font-size: 13px; font-weight: 700;
+  display: none; align-items: center; gap: 8px;
+  box-shadow: 0 10px 30px -5px var(--glow-pink);
+  cursor: pointer; z-index: 100;
+  border: none;
+  transition: all 0.3s var(--transition);
+}
+.floating-all-dramas.show { display: flex; }
+.floating-all-dramas:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 15px 40px -5px var(--glow-pink);
+}
+.floating-all-dramas:active { transform: scale(0.95); }
+
+/* Animations */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ✅ FIXED FULLSCREEN CONTROLS */
+.player-card:-webkit-full-screen,
+.player-card:fullscreen {
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: none !important;
+  border-radius: 0 !important;
+  margin: 0 !important;
+  background: #000;
+}
+
+.player-card:-webkit-full-screen .yt-wrapper,
+.player-card:fullscreen .yt-wrapper {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  padding-bottom: 0 !important;
+  transform: none !important;
+}
+
+.player-card:-webkit-full-screen .custom-controls,
+.player-card:fullscreen .custom-controls {
+  bottom: 0; left: 0; right: 0;
+  padding: 0 20px 20px 20px;
+  position: absolute;
+  width: 100%;
+}
+
+.player-card:-webkit-full-screen .overlay,
+.player-card:fullscreen .overlay {
+  height: 150px;
+  background: black;
+}
+
+.player-card:-webkit-full-screen .yt-wrapper::before,
+.player-card:fullscreen .yt-wrapper::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 80px;
+  background: #000;
+  z-index: 8;
+  pointer-events: none;
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .page-header { padding: 12px 14px; }
+  .brand-icon { width: 32px; height: 32px; font-size: 14px; }
+  .brand-text { font-size: 15px; }
+  .hero { padding: 24px 0 20px; }
+  .hero h1 { font-size: 26px; }
+  .hero p { font-size: 13px; }
+  .main-wrap { padding: 0 14px; }
+  .playlist-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .playlist-card-title { font-size: 12px; padding: 10px; }
+  .episodes-grid { gap: 10px; }
+  .episode-title { font-size: 11px; }
+  .custom-controls { padding: 10px 12px; }
+  .ctrl-btn { width: 30px; height: 30px; }
+  .play-pause-btn { width: 38px; height: 38px; }
+  .play-pause-btn i { font-size: 1rem; }
+  .left-controls, .right-controls { gap: 8px; }
+  .time-current, .time-total { font-size: 11px; }
+  .quality-toggle-btn { font-size: 10px; padding: 3px 10px; height: 30px; }
+  .player-spacer { height: 300px; }
+  .floating-all-dramas { bottom: 15px; left: 15px; padding: 10px 16px; font-size: 13px; }
+  .volume-wrap { display: none; }
+}
+
+/* ✅ STYLISH FOOTER */
+.site-footer {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  padding: 30px 20px 40px;
+  margin-top: auto;
+  border-top: 1px solid var(--border);
+  background: var(--bg-primary);
+  width: 100%;
+}
+.footer-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+  letter-spacing: 0.5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.footer-name {
+  font-size: 18px;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--accent-1), var(--accent-2), var(--accent-3));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 1px;
+  text-shadow: 0 0 20px rgba(255,0,204,0.3);
+  animation: pulseGlow 3s infinite alternate;
+}
+@keyframes pulseGlow {
+  0% { filter: drop-shadow(0 0 5px rgba(0,255,255,0.2)); }
+  100% { filter: drop-shadow(0 0 15px rgba(255,0,204,0.6)); }
+}
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-secondary); }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(var(--accent-1), var(--accent-2));
+  border-radius: 10px;
+}
+
+</style>
+</head>
+<body>
+
+<header class="page-header" id="mainHeader">
+  <div class="header-inner">
+    <button class="back-btn" id="backBtn">
+      <i class="fas fa-arrow-left"></i> Back
+    </button>
+    <div class="brand">
+      <div class="brand-icon"><i class="fas fa-play"></i></div>
+      <div>
+        <div class="brand-text" id="pageTitle">Green Entertainment Serials</div>
+        <div class="brand-sub"></div>
+      </div>
+    </div>
+    <button class="theme-toggle" id="themeToggle" title="Toggle theme">
+      <i class="fas fa-moon" id="themeIcon"></i>
+    </button>
+  </div>
+</header>
+
+<main class="main-wrap">
+
+  <section id="playlistSection">
+    <div class="hero">
+      <h1>Watch Your <span>Favorite Dramas</span></h1>
+      <p>Stream Premium Green Entertainment Serials In Stunning Quality</p>
+      <div class="search-wrap">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Search serials...">
+      </div>
+    </div>
+
+    <div class="playlist-section">
+      <div class="section-header">
+        <div class="section-title"><i class="fas fa-fire"></i> All Serials</div>
+        <div class="section-count" id="playlistCount">0</div>
+      </div>
+      <div class="playlist-grid" id="playlistGrid"></div>
+      
+      <!-- ✅ PAGINATION CONTAINER -->
+      <div class="pagination-container" id="paginationContainer">
+        <div class="page-info" id="pageInfo">Showing 0 of 0 dramas</div>
+        <div class="pagination-btns">
+          <button class="pagination-btn" id="prevBtn" style="display: none;">
+            <i class="fas fa-arrow-left"></i> Back (Previous 15)
+          </button>
+          <button class="pagination-btn" id="nextBtn">
+            See More (Load 15 more)
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="playerSection">
+    <div class="player-card" id="playerCard">
+      <div class="yt-wrapper" id="ytWrapper">
+        <div class="click-capture" id="clickCapture"></div>
+        
+        <!-- ✅ YOUTUBE UI HIDE KARNE K LIYE FULL SOLID BLACK OVERLAY -->
+        <div id="ytPauseOverlay" style="position: absolute; inset: 0; background: #000; z-index: 15; display: none; pointer-events: none;"></div>
+
+        <div class="overlay" id="overlay"></div>
+
+        <div class="center-play-overlay" id="centerPlayOverlay">
+          <img id="posterImage" class="poster-img" src="" alt="Video Poster" />
+          <div class="big-play-btn" id="bigPlayBtn">
+            <i class="fas fa-play"></i>
+          </div>
+        </div>
+
+        <div class="loader-container" id="loaderContainer">
+          <div class="modern-spinner"><div></div><div></div><div></div></div>
+        </div>
+
+        <div class="custom-controls" id="customControls">
+          <div class="progress-container">
+            <span class="time-current" id="currentTime">0:00</span>
+            <div class="progress-bar" id="progressBar">
+              <div class="progress-buffered" id="progressBuffered"></div>
+              <div class="progress-filled" id="progressFilled"></div>
+            </div>
+            <span class="time-total" id="totalTime">0:00</span>
+          </div>
+
+          <div class="buttons-row">
+            <div class="left-controls">
+              <button class="ctrl-btn" id="rewind10">
+                <i class="fas fa-rotate-left"></i>
+              </button>
+              <button class="ctrl-btn play-pause-btn" id="playPauseBtn">
+                <i class="fas fa-play" id="playPauseIcon"></i>
+              </button>
+              <button class="ctrl-btn" id="forward10">
+                <i class="fas fa-rotate-right"></i>
+              </button>
+              <div class="volume-wrap">
+                <button class="ctrl-btn" id="muteBtn">
+                  <i class="fas fa-volume-high" id="volumeIcon"></i>
+                </button>
+                <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="80">
+              </div>
+            </div>
+
+            <div class="right-controls">
+              <div class="quality-wrapper">
+                <button class="quality-toggle-btn" id="qualityToggleBtn">
+                  <span id="currentQualityLabel">Auto</span> <i class="fas fa-chevron-up"></i>
+                </button>
+                <div class="quality-menu" id="qualityMenu">
+                  <div class="quality-option active" data-quality="default">Auto</div>
+                </div>
+              </div>
+
+              <button class="ctrl-btn fullscreen-btn" id="fullscreenBtn">
+                <i class="fas fa-expand" id="fullscreenIcon"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="player-spacer"></div>
+
+    <div class="episodes-section">
+      <div class="section-header">
+        <div class="section-title"><i class="fas fa-list"></i> Episodes</div>
+        <div class="section-count" id="episodeCount">0</div>
+      </div>
+      <div class="episodes-grid" id="episodesGrid"></div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="footer-text">
+    <span>&copy; All Rights Reserved.</span>
+    <span>Made with by</span>
+    <span class="footer-name"><i class="fas fa-heart" style="color: var(--accent-2);"></i>
+Syed Muzammil Shah<i class="fas fa-heart" style="color: var(--accent-2);"></i>
+</span>
+  </div>
+</footer>
+
+<button class="floating-all-dramas" id="floatingAllDramas">
+  <i class="fas fa-arrow-left"></i> All Serials
+</button>
+
+<script>
+const YOUTUBE_API_KEY = 'AIzaSyACxqw-OnpXUZFv7ym_PTiH4QkdX_KRsN4';
+
+const PLAYLISTS = [
+  { title: "Mitti De Baway", image: "https://i.ytimg.com/vi/P4zyZAl30To/hqdefault.jpg", playlistId: "PLBRSUhnf-g1I", category: "GREEN ENT Serial" },
+    { title: "Nizaam", image: "https://i.ytimg.com/vi/eJlBK-8JHmo/hqdefault.jpg", playlistId: "PLSfzwae_DouE", category: "GREEN ENT Serial" },
+    { title: "Madaar", image: "https://i.ytimg.com/vi/lWyspJk5FWc/hqdefault.jpg", playlistId: "PLO4c4i8xoQT4", category: "GREEN ENT Serial" },
+    { title: "Raqaas", image: "https://i.ytimg.com/vi/hIxoxwFztIU/hqdefault.jpg", playlistId: "PLcdqZTZHraLM", category: "GREEN ENT Serial" },
+    { title: "Dastoor", image: "https://i.ytimg.com/vi/rNQF9K3HdOo/hqdefault.jpg", playlistId: "PLDOgzw7ddDwI", category: "GREEN ENT Serial" },
+    { title: "Intekhab", image: "https://i.ytimg.com/vi/dbL9xd6wvhE/hqdefault.jpg", playlistId: "PLs2CG9JU32b6fl4ixVEE-USXBARjQPWlV", category: "GREEN ENT Serial" },
+    { title: "Aik Mohabbat Aur", image: "https://i.ytimg.com/vi/8cl8TYft7nY/hqdefault.jpg", playlistId: "PLs2CG9JU32b7Ll86NYXQGsL_TjG0UnN0g", category: "GREEN ENT Serial" },
+    { title: "Laaj", image: "https://i.ytimg.com/vi/dqOtjOlDtwg/hqdefault.jpg", playlistId: "PLs2CG9JU32b6NXHosXa0JfCnknf48kvv7", category: "GREEN ENT Serial" },
+    { title: "Khuda Gawah", image: "https://i.ytimg.com/vi/jeq3uK4OJvU/hqdefault.jpg", playlistId: "PLs2CG9JU32b42fqGMvOS0JEqMGn6SESGw", category: "GREEN ENT Serial" },
+    { title: "Khwaab Meray", image: "https://i.ytimg.com/vi/_CBAniwQK3w/hqdefault.jpg", playlistId: "PLs2CG9JU32b54rs7pNqz_OKOCfqQTNLTC", category: "GREEN ENT Serial" },
+    { title: "Jahannum Ba'raasta Jannat (JBJ)", image: "https://i.ytimg.com/vi/hdk4V7QsTqc/hqdefault.jpg", playlistId: "PLs2CG9JU32b4kCUtrxDX-5UkXaJMQX_09", category: "GREEN ENT Serial" },
+    { title: "Fasaana Mart Ka", image: "https://i.ytimg.com/vi/lfvuHT5vs3s/hqdefault.jpg", playlistId: "PLs2CG9JU32b7pGIyYk0jsGOrUIa_Ou2qF", category: "GREEN ENT Serial" },
+    
+    { title: "Maa", image: "https://i.ytimg.com/vi/CDP0-3YNHr8/hqdefault.jpg", playlistId: 'PLs2CG9JU32b4tzGXlIkA0I0lveE7GWgS1', category: "GREEN ENT Serial" },
+    { title: "Rahguzar", image: "https://i.ytimg.com/vi/bW06CtUqxRQ/hqdefault.jpg", playlistId: 'PLs2CG9JU32b4Xup0ey7YL5775CqA8zNBr', category: "GREEN ENT Serial" },
+    { title: "Ghulam Bashah Sundri", image: "https://i.ytimg.com/vi/KioJq0N3Ggk/hqdefault.jpg", playlistId: 'PLs2CG9JU32b5vX4zz3fN1xJHavj4ZgSk2', category: "GREEN ENT Serial" },
+    { title: "Humnava", image: "https://i.ytimg.com/vi/DXEik1BwlTo/hqdefault.jpg", playlistId: 'PLs2CG9JU32b6Gnt65DgyKmc7uunxVvq5O', category: "GREEN ENT Serial" },
+    { title: "Faaslay", image: "https://i.ytimg.com/vi/L8q9sfyDeUY/hqdefault.jpg", playlistId: 'PLs2CG9JU32b7Fnm0nMQOCcAL4Z4ybPX4M', category: "GREEN ENT Serial" },
+    { title: "Visaal E Ishq", image: "https://i.ytimg.com/vi/BUYPoZNSdp8/hqdefault.jpg", playlistId: 'PLs2CG9JU32b6wEtS1W_6TgdK0TxJoV7IL', category: "GREEN ENT Serial" },
+    { title: "Aik Bhool", image: "https://i.ytimg.com/vi/m_ZKHzhSno4/hqdefault.jpg", playlistId: 'PLs2CG9JU32b6Lrlqm1ug2MEae-dsQoUwL', category: "GREEN ENT Serial" },
+    { title: "Main Zameen Tu Aasmaan", image: "https://i.ytimg.com/vi/nmIDy6sehV8/hqdefault.jpg", playlistId: 'PLs2CG9JU32b5UvgEP1WvYzhj9ufFDsD2E', category: "GREEN ENT Serial" },
+    { title: "Pamaal", image: "https://i.ytimg.com/vi/hZ-K2NCUaxA/hqdefault.jpg", playlistId: 'PLs2CG9JU32b54KxkYkqpuk55CT4idd4Y7', category: "GREEN ENT Serial" },
+    { title: "Sharakat", image: "https://i.ytimg.com/vi/NscSwgfUnPc/hqdefault.jpg", playlistId: 'PLs2CG9JU32b6FDwgSsa5OsgHuLSRaEBjv', category: "GREEN ENT Serial" },
+    { title: "Ishq Di Chashni HD", image: "https://i.ytimg.com/vi/Hsw5RMLyyas/hqdefault.jpg", playlistId: 'PLs2CG9JU32b4EbRwbDMDeIiQRo49jyO3y', category: "GREEN ENT Serial" },
+    { title: "Naqsh", image: "https://i.ytimg.com/vi/6glWW1po_qY/hqdefault.jpg", playlistId: 'PLs2CG9JU32b5u9Ak4XnG4CjRQTV5ogs0q', category: "GREEN ENT Serial" },
+    { title: "Shikaar HD", image: "https://i.ytimg.com/vi/1li4FngqrOs/hqdefault.jpg", playlistId: 'PLs2CG9JU32b4P2Yeu-ogE3BOUTMKY3WNd', category: "GREEN ENT Serial" },
+    { title: "Kabli Pulao HD", image: "https://i.ytimg.com/vi/762JvGiUh6o/hqdefault.jpg", playlistId: 'PLs2CG9JU32b7o-ifQPBi5zcRwBrMsxRjS', category: "GREEN ENT Serial" },
+    { title: "Do Kinaray", image: "https://i.ytimg.com/vi/02IBPv_V83Y/hqdefault.jpg", playlistId: 'PLs2CG9JU32b7kNGvHqlW5c1fJcqbDYmgU', category: "GREEN ENT Serial" },
+    { title: "Dil Manay Na", image: "https://i.ytimg.com/vi/HMAn_XqrK74/hqdefault.jpg", playlistId: 'PLs2CG9JU32b7gTjMOiZKmZ4mV4VU3JV7D', category: "GREEN ENT Serial" },
+    { title: "Jindo", image: "https://i.ytimg.com/vi/GSxKUSDwpas/hqdefault.jpg", playlistId: 'PLs2CG9JU32b6r1foTjB3crwFBDecV7Lbi', category: "GREEN ENT Serial" },
+    { title: "Behroopia", image: "https://i.ytimg.com/vi/6w0UK1t-f7w/hqdefault.jpg", playlistId: 'PLs2CG9JU32b7kUs90mI4YW469yPXNeMV_', category: "GREEN ENT Serial" },
+    { title: "Ishq Tum Se Hua", image: "https://i.ytimg.com/vi/tMOYV0Xf9yY/hqdefault.jpg", playlistId: 'PLs2CG9JU32b6ufVzx0RVq6BsA9SnX1clg', category: "GREEN ENT Serial" },
+    { title: "Zarb e Mehmet", image: "https://i.ytimg.com/vi/2rVAD1vv2u4/hqdefault.jpg", playlistId: 'PLs2CG9JU32b4HNteU_MuyyrsD-dR2WsgA', category: "GREEN ENT Serial" },
+    { title: "Na Tum Jano Na Hum", image: "https://i.ytimg.com/vi/Zz1S-Z9p298/hqdefault.jpg", playlistId: 'PLs2CG9JU32b5GP2hYAqsFoMfO57mROa3k', category: "GREEN ENT Serial" },
+    { title: "Ishq Di Chashni", image: "https://i.ytimg.com/vi/Sz88EbymfOk/hqdefault.jpg", playlistId: 'PLs2CG9JU32b6Bwut0tGPDGhJr0mgA032z', category: "GREEN ENT Serial" },
+    { title: "Mehmed: Fetihler Sultani - The Undefeated Warrior", image: "https://i.ytimg.com/vi/ww4FIQDy-tA/hqdefault.jpg", playlistId: 'PLs2CG9JU32b5DhjPf3osEagmdBkpe-rbA', category: "GREEN ENT Serial" },
+    { title: "Mohabbat Aur Mehangai", image: "https://i.ytimg.com/vi/f_UfA3zfw5U/hqdefault.jpg", playlistId: 'PLs2CG9JU32b6ukwJaPYHm_EjVaY5TGUID', category: "GREEN ENT Serial" },
+    { title: "Diyar-e-Yaar", image: "https://i.ytimg.com/vi/7Qyq6t9KsC0/hqdefault.jpg", playlistId: 'PLs2CG9JU32b5lf42cmQxVuP7eFswrqxrh', category: "GREEN ENT Serial" },
+    { title: "Faraar", image: "https://i.ytimg.com/vi/kg1HCsqk_BI/hqdefault.jpg", playlistId: 'PLs2CG9JU32b4AMQXxXoxjN8lwbISb30Cr', category: "GREEN ENT Serial" },
+    { title: "Shehzadi House", image: "https://i.ytimg.com/vi/CN4UHzSiKQs/hqdefault.jpg", playlistId: 'PLs2CG9JU32b5ie8s6SK2KhlEIGVEaWVmO', category: "GREEN ENT Serial" },
+    { title: "Mooray Piya", image: "https://i.ytimg.com/vi/czNFMXQ9Efk/hqdefault.jpg", playlistId: 'PLs2CG9JU32b7uNVD4GFHE-tDmge9SrkPI', category: "GREEN ENT Serial" },
+    { title: "DuniyaPur", image: "https://i.ytimg.com/vi/t-afjSfQslM/hqdefault.jpg", playlistId: 'PLs2CG9JU32b73PLNzMrJBMHLKhKB2rweC', category: "GREEN ENT Serial" },
+    { title: "Iqtidar", image: "https://i.ytimg.com/vi/GS_W9boJEj0/hqdefault.jpg", playlistId: 'PLs2CG9JU32b6PZLvuxABUgtUhsk29CIqA', category: "GREEN ENT Serial" },
+    { title: "Ishq Beparwah", image: "https://i.ytimg.com/vi/UZXDyz5gj38/hqdefault.jpg", playlistId: 'PLs2CG9JU32b5_CiR5MrQ6u81mJieztvhk', category: "GREEN ENT Serial" },
+    { title: "Meray Ranjhna", image: "https://i.ytimg.com/vi/6Fu4P9tN3i8/hqdefault.jpg", playlistId: 'PLs2CG9JU32b4Zs81f9bewmQoUPQ-woHhc', category: "GREEN ENT Serial" },
+    { title: "Dil Ka Kya Karein", image: "https://i.ytimg.com/vi/-1l1KdVhmaI/hqdefault.jpg", playlistId: 'PLs2CG9JU32b7sYL3sGCa_o9CDjNrCPWyb', category: "GREEN ENT Serial" },
+    { title: "Gentleman", image: "https://i.ytimg.com/vi/MgNX19HFg_U/hqdefault.jpg", playlistId: 'PLs2CG9JU32b4AjRCWduY-KAXbSaPCLVje', category: "GREEN ENT Serial" },
+    { title: "Let's Try Mohabbat", image: "https://i.ytimg.com/vi/05FXD6LOZh0/hqdefault.jpg", playlistId: 'PLs2CG9JU32b4JMABh0Vru6oibmetiKnCr', category: "GREEN ENT Serial" },
+    { title: "Dua Aur Azan", image: "https://i.ytimg.com/vi/eDCSCP250Qk/hqdefault.jpg", playlistId: 'PLs2CG9JU32b5HjpP9opxjRa4HBE-cSI70', category: "GREEN ENT Serial" },
+    { title: "Yaar e Mann", image: "https://i.ytimg.com/vi/cDx2WZXtXHI/hqdefault.jpg", playlistId: 'PLs2CG9JU32b59m44fwgIdTgPXYlfBU3hW', category: "GREEN ENT Serial" },
+    { title: "Pas e Deewar", image: "https://i.ytimg.com/vi/8B5izub15d8/hqdefault.jpg", playlistId: 'PLs2CG9JU32b5Fw30QApo86RweSPhMu2qJ', category: "GREEN ENT Serial" },
+    { title: "Rafta Rafta", image: "https://i.ytimg.com/vi/o1wbr_r-AxI/hqdefault.jpg", playlistId: 'PLs2CG9JU32b5IcCyi2m-x8_oh-QSh7HxA', category: "GREEN ENT Serial" },
+    { title: "Nasihat", image: "https://i.ytimg.com/vi/-LutC_6iB98/hqdefault.jpg", playlistId: 'PLs2CG9JU32b5jIU2L8AVX-T6l4hm3HaYR', category: "GREEN ENT Serial" },
+    { title: "FANAA", image: "https://i.ytimg.com/vi/drDR85Z7khA/hqdefault.jpg", playlistId: 'PLs2CG9JU32b5L1Rt_IyZumpryulwW5r7D', category: "GREEN ENT Serial" },
+    { title: "Pagal Khana", image: "https://i.ytimg.com/vi/fuDROgOiK0c/hqdefault.jpg", playlistId: 'PLs2CG9JU32b7HiOA-29HKwhzfVKmsi_Mj', category: "GREEN ENT Serial" },
+    { title: "Akhara", image: "https://i.ytimg.com/vi/3ZZn3haoRFA/hqdefault.jpg", playlistId: 'PLs2CG9JU32b7iF3Iszyd63vxm47qeYysE', category: "GREEN ENT Serial" },
+    { title: "Mohabbat Satrangi", image: "https://i.ytimg.com/vi/vaEfSD7kei0/hqdefault.jpg", playlistId: 'PLs2CG9JU32b6IPJTflvjKk0qSswFpBo3p', category: "GREEN ENT Serial" },
+    { title: "Serial Killer", image: "https://i.ytimg.com/vi/RBUr1DRvhIw/hqdefault.jpg", playlistId: 'PLs2CG9JU32b45e7UA849qZ4NcRJSPMqTD', category: "GREEN ENT Serial" },
+    { title: "Ek Jhooti Love Story", image: "https://i.ytimg.com/vi/xOOcgitrc6g/hqdefault.jpg", playlistId: 'PLs2CG9JU32b4rScQ5TPxsUo33vgtrB1zy', category: "GREEN ENT Serial" },
+    { title: "Standup Girl", image: "https://i.ytimg.com/vi/qTnlesoGQhg/hqdefault.jpg", playlistId: 'PLs2CG9JU32b5UKvnzUVjQEZO95asLTgZ0', category: "GREEN ENT Serial" },
+    { title: "Mor Chaal", image: "https://i.ytimg.com/vi/YgxyOkUclO4/hqdefault.jpg", playlistId: 'PLs2CG9JU32b7-TTBNOH7KRS7E74bWXjgJ', category: "GREEN ENT Serial" },
+    { title: "Breaking News", image: "https://i.ytimg.com/vi/8bw12Ty4Q4c/hqdefault.jpg", playlistId: 'PLs2CG9JU32b6HPfEdy-xoq6eDdIuMBiRM', category: "GREEN ENT Serial" },
+    { title: "Grey", image: "https://i.ytimg.com/vi/swqPzGumSXg/hqdefault.jpg", playlistId: 'PLs2CG9JU32b4PcWmvVXa0kbRLsMRNixdu', category: "GREEN ENT Serial" },
+    { title: "Shikaar", image: "https://i.ytimg.com/vi/k6GGhlAFNAE/hqdefault.jpg", playlistId: 'PLs2CG9JU32b52Ul6IU80wdqFFCq1zZdv1', category: "GREEN ENT Serial" },
+    { title: "Gumn", image: "https://i.ytimg.com/vi/rJ5pgdx1eBE/hqdefault.jpg", playlistId: 'PLs2CG9JU32b5Tn0j3JC9NtKx9RmDvlxoF', category: "GREEN ENT Serial" },
+    { title: "Fatima Feng", image: "https://i.ytimg.com/vi/4FGdoYydVsA/hqdefault.jpg", playlistId: 'PLs2CG9JU32b6JHOpemzKi-vi_SEjjv6Mp', category: "GREEN ENT Serial" },
+    { title: "Working Women", image: "https://i.ytimg.com/vi/pGmfWeaZtR0/hqdefault.jpg", playlistId: 'PLs2CG9JU32b6ngAr1tG1ICVfkBeS-jHqf', category: "GREEN ENT Serial" },
+    { title: "22 Qadam", image: "https://i.ytimg.com/vi/EJzOeoAapTk/hqdefault.jpg", playlistId: 'PLs2CG9JU32b4iAMLdzNQV3VEKxVM7XGl1', category: "GREEN ENT Serial" },
+    { title: "Wonderland", image: "https://i.ytimg.com/vi/50peoCSAwj8/hqdefault.jpg", playlistId: 'PLs2CG9JU32b7BIw3Z6xp-JdOBNENzUxSc', category: "GREEN ENT Serial" },
+    { title: "Idiot", image: "https://i.ytimg.com/vi/yTePe3peC4I/hqdefault.jpg", playlistId: 'PLs2CG9JU32b4UwLrQVDkcXrJLf-GUXEPj', category: "GREEN ENT Serial" },
+    { title: "Apney Hee Tou Hain", image: "https://i.ytimg.com/vi/placeholder/hqdefault.jpg", playlistId: 'PLs2CG9JU32b4LNAnlbjT_TH0I2eDvl66N', category: "GREEN ENT Serial" },
+    { title: "101 Talaqain", image: "https://i.ytimg.com/vi/VQvuQufImpU/hqdefault.jpg", playlistId: 'PLs2CG9JU32b4SRVIsZ7mnRUQxKhVZ-4lB', category: "GREEN ENT Serial" },
+    { title: "Nauroz", image: "https://i.ytimg.com/vi/7rJVuNrXSh8/hqdefault.jpg", playlistId: 'PLs2CG9JU32b4G9eUZ0CXVre0CXJgzOJbJ', category: "GREEN ENT Serial" },
+    { title: "Daurr", image: "https://i.ytimg.com/vi/fFzewZjHcI8/hqdefault.jpg", playlistId: 'PLs2CG9JU32b5EOOJIO_LbupzzvN3Dfr8E', category: "GREEN ENT Serial" },
+    { title: "College Gate", image: "https://i.ytimg.com/vi/kPsl_YgEHOY/hqdefault.jpg", playlistId: 'PLs2CG9JU32b7STz23L-FCtpwCgOLwcSkQ', category: "GREEN ENT Serial" },
+    { title: "Shanaas", image: "https://i.ytimg.com/vi/TFzIMpB1BvU/hqdefault.jpg", playlistId: 'PLs2CG9JU32b6rrpEHQCRsc-NLtuAeTJq1', category: "GREEN ENT Serial" },
+    { title: "Honey Moon", image: "https://i.ytimg.com/vi/wsgZhpZW28U/hqdefault.jpg", playlistId: 'PLs2CG9JU32b7XWJqPO_YPev5EbRG6HLH1', category: "GREEN ENT Serial" },
+    { title: "Tumharey Husn Kay Naam", image: "https://i.ytimg.com/vi/kG-YCHPtKNg/hqdefault.jpg", playlistId: 'PLs2CG9JU32b51JhgFUUEcgV8lh5kq_kAi', category: "GREEN ENT Serial" },
+    { title: "Kabli Pulao", image: "https://i.ytimg.com/vi/uxXeBFPGZhs/hqdefault.jpg", playlistId: 'PLs2CG9JU32b6vqj8XCbS0GqeYWrIdF4T0', category: "GREEN ENT Serial" },
+    
+    
+    
+    
+    { title: "Siyaah Series", image: "https://i.ytimg.com/vi/TZ6dwyhE950/hqdefault.jpg", playlistId: 'PLs2CG9JU32b7PXjJBeAqRyUFtLfnINHuM', category: "GREEN ENT Serial" },
+    { title: "Jeevan Nagar", image: "https://i.ytimg.com/vi/tvaq1oWU6Jg/hqdefault.jpg", playlistId: 'PLs2CG9JU32b5u89QIvVXowiDrBcFaCn6j', category: "GREEN ENT Serial" }
+
+    
+    
+];
+
+let player, isPlayerReady = false, hideControlsTimeout = null;
+let controlsVisible = true, isPlaying = false, hasStarted = false;
+let isFullscreen = false, lastVolume = 80, currentEpisodes = [];
+let currentVideoIndex = 0;
+
+// ✅ AD DETECTION VARIABLES
+let isAdPlaying = false;
+let adCheckInterval = null;
+let lastPlayerState = -1;
+let adStartTime = 0;
+let adEndTime = 0;
+
+let currentPage = 0;
+const itemsPerPage = 20;
+let filteredPlaylists = [...PLAYLISTS];
+
+const $ = id => document.getElementById(id);
+const playerCard = $('playerCard'), ytWrapper = $('ytWrapper');
+const customControls = $('customControls'), clickCapture = $('clickCapture');
+const playPauseBtn = $('playPauseBtn'), playPauseIcon = $('playPauseIcon');
+const progressBar = $('progressBar'), progressFilled = $('progressFilled');
+const progressBuffered = $('progressBuffered');
+const currentTimeEl = $('currentTime'), totalTimeEl = $('totalTime');
+const loaderContainer = $('loaderContainer'), centerPlayOverlay = $('centerPlayOverlay');
+const bigPlayBtn = $('bigPlayBtn'), posterImage = $('posterImage');
+const qualityToggleBtn = $('qualityToggleBtn'), qualityMenu = $('qualityMenu');
+const currentQualityLabel = $('currentQualityLabel');
+const fullscreenBtn = $('fullscreenBtn'), fullscreenIcon = $('fullscreenIcon');
+const playerSection = $('playerSection'), playlistSection = $('playlistSection');
+const playlistGrid = $('playlistGrid'), episodesGrid = $('episodesGrid');
+const backBtn = $('backBtn'), pageTitle = $('pageTitle');
+const floatingAllDramas = $('floatingAllDramas');
+const searchInput = $('searchInput');
+const themeToggle = $('themeToggle'), themeIcon = $('themeIcon');
+const muteBtn = $('muteBtn'), volumeIcon = $('volumeIcon'), volumeSlider = $('volumeSlider');
+const mainHeader = $('mainHeader');
+const ytPauseOverlay = $('ytPauseOverlay'); 
+const prevBtn = $('prevBtn'), nextBtn = $('nextBtn'), pageInfo = $('pageInfo');
+
+// Theme Setup
+const savedTheme = localStorage.getItem('theme') || 'dark';
+document.documentElement.setAttribute('data-theme', savedTheme);
+updateThemeIcon(savedTheme);
+themeToggle.addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  updateThemeIcon(next);
+});
+function updateThemeIcon(theme) {
+  themeIcon.className = theme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+}
+
+function renderPlaylistGrid(filter = '', resetPage = true) {
+  filteredPlaylists = PLAYLISTS.filter(p => p.title.toLowerCase().includes(filter.toLowerCase()));
+  if (resetPage) currentPage = 0;
+  
+  const startIndex = currentPage * itemsPerPage;
+  const endIndex = Math.min(startIndex + itemsPerPage, filteredPlaylists.length);
+  const currentItems = filteredPlaylists.slice(startIndex, endIndex);
+
+  playlistGrid.innerHTML = '';
+  $('playlistCount').textContent = filteredPlaylists.length;
+  pageInfo.textContent = `Showing ${endIndex} of ${filteredPlaylists.length} dramas`;
+
+  prevBtn.style.display = currentPage > 0 ? 'block' : 'none';
+  nextBtn.style.display = endIndex < filteredPlaylists.length ? 'block' : 'none';
+
+  if (filteredPlaylists.length === 0) {
+    playlistGrid.innerHTML = `
+      <div class="empty-state" style="grid-column: 1/-1;">
+        <i class="fas fa-search"></i>
+        <h3>No results found</h3>
+        <p>Try a different search term</p>
+      </div>`;
+    return;
+  }
+
+  currentItems.forEach((pl, i) => {
+    const card = document.createElement('div');
+    card.className = 'playlist-card';
+    card.style.animationDelay = (i * 0.05) + 's';
+    card.onclick = () => openPlaylist(pl.playlistId, pl.title, pl.image);
+    card.innerHTML = `
+      <div class="playlist-thumb">
+        <img src="${pl.image}" alt="${pl.title}" loading="lazy">
+        <div class="play-badge"><i class="fas fa-play"></i></div>
+      </div>
+      <div class="playlist-card-title">${pl.title}</div>
+    `;
+    playlistGrid.appendChild(card);
+  });
+}
+
+nextBtn.addEventListener('click', () => {
+  if ((currentPage + 1) * itemsPerPage < filteredPlaylists.length) {
+    currentPage++;
+    renderPlaylistGrid(searchInput.value, false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+});
+
+prevBtn.addEventListener('click', () => {
+  if (currentPage > 0) {
+    currentPage--;
+    renderPlaylistGrid(searchInput.value, false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+});
+
+async function openPlaylist(playlistId, title, coverImage) {
+  history.pushState({ page: 'player', playlistId }, '', '#playlist');
+
+  playlistSection.style.display = 'none';
+  playerSection.classList.add('active');
+  mainHeader.classList.add('hidden');
+
+  backBtn.classList.add('show');
+  floatingAllDramas.classList.add('show');
+  pageTitle.textContent = title;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  hasStarted = false;
+  centerPlayOverlay.classList.remove('hidden');
+  posterImage.src = coverImage;
+  totalTimeEl.textContent = '0:00';
+  totalTimeEl.classList.remove('show');
+  currentTimeEl.textContent = '0:00';
+  progressFilled.style.width = '0%';
+  progressBuffered.style.width = '0%';
+
+  episodesGrid.innerHTML = `
+    <div class="skeleton-grid" style="grid-column:1/-1;">
+      ${Array(6).fill('<div class="skeleton-card"></div>').join('')}
+    </div>`;
+
+  try {
+    let allItems = [];
+    let nextPageToken = '';
+    let fetchMore = true;
+
+    while (fetchMore) {
+      const res = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&maxResults=50&playlistId=${playlistId}&key=${YOUTUBE_API_KEY}${nextPageToken ? '&pageToken=' + nextPageToken : ''}`);
+      const data = await res.json();
+      
+      if (data.error) {
+        throw new Error(data.error.message || "API Error");
+      }
+      
+      if (data.items) allItems = allItems.concat(data.items);
+      
+      if (data.nextPageToken) {
+        nextPageToken = data.nextPageToken;
+      } else {
+        fetchMore = false;
+      }
+    }
+
+    if (allItems.length === 0) {
+      episodesGrid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
+        <i class="fas fa-film"></i>
+        <h3>No episodes found</h3>
+        <p>This playlist appears to be empty or private</p>
+      </div>`;
+      return;
+    }
+
+    const rawVideos = [];
+    const seenIds = new Set();
+    
+    allItems.forEach(item => {
+      if (item.snippet && item.snippet.resourceId && item.snippet.resourceId.videoId) {
+        const videoId = item.snippet.resourceId.videoId;
+        const vidTitle = item.snippet.title;
+
+        const isPrivate = !vidTitle || 
+                          vidTitle.toLowerCase().includes('private video') || 
+                          vidTitle.toLowerCase().includes('deleted video');
+
+        if (!seenIds.has(videoId) && !isPrivate) { 
+          seenIds.add(videoId); 
+          rawVideos.push(item); 
+        }
+      }
+    });
+    
+    rawVideos.sort((a, b) => new Date(a.snippet.publishedAt) - new Date(b.snippet.publishedAt));
+
+    const uniqueVideos = [];
+    const seenEpisodeNumbers = new Set();
+
+    rawVideos.forEach((item, idx) => {
+      const originalTitle = item.snippet.title || '';
+      let epNum = idx + 1;
+
+      const epMatch = originalTitle.match(/(?:episode|ep)\s*[-:]?\s*(\d+)/i);
+      if (epMatch && epMatch[1]) {
+        let parsed = parseInt(epMatch[1], 10);
+        if (!isNaN(parsed)) epNum = parsed;
+      }
+
+      if (seenEpisodeNumbers.has(epNum)) {
+        epNum = uniqueVideos.length + 1;
+      }
+
+      seenEpisodeNumbers.add(epNum);
+      item.extractedEpNum = epNum;
+      uniqueVideos.push(item);
+    });
+    
+    if (uniqueVideos.length === 0) {
+      episodesGrid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><p>No valid episodes found.</p></div>`;
+      return;
+    }
+
+    currentEpisodes = uniqueVideos;
+    currentVideoIndex = 0;
+    const firstVideoId = uniqueVideos[0].snippet.resourceId.videoId;
+    posterImage.src = coverImage;
+
+    if (player?.loadVideoById) {
+      player.loadVideoById(firstVideoId);
+      player.pauseVideo();
+    }
+
+    episodesGrid.innerHTML = '';
+    $('episodeCount').textContent = uniqueVideos.length;
+
+    uniqueVideos.forEach((item, idx) => {
+      const videoId = item.snippet.resourceId.videoId;
+      let thumbnail = coverImage;
+      
+      if (item.snippet.thumbnails) {
+        if (item.snippet.thumbnails.high) thumbnail = item.snippet.thumbnails.high.url;
+        else if (item.snippet.thumbnails.medium) thumbnail = item.snippet.thumbnails.medium.url;
+        else if (item.snippet.thumbnails.default) thumbnail = item.snippet.thumbnails.default.url;
+      }
+
+      const epNum = item.extractedEpNum;
+      const displayTitle = `Episode ${epNum < 10 ? '0' + epNum : epNum}`;
+
+      const card = document.createElement('div');
+      card.className = 'episode-card' + (idx === 0 ? ' active' : '');
+      card.style.animationDelay = (idx * 0.03) + 's';
+      card.dataset.videoId = videoId;
+      card.onclick = () => {
+        currentVideoIndex = idx;
+        updateActiveEpisodeUI(idx);
+        changeVideo(videoId, displayTitle, thumbnail);
+        const playerBottom = ytWrapper.getBoundingClientRect().bottom;
+        if (playerBottom < 0) {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      };
+      
+      card.innerHTML = `
+        <div class="episode-thumb">
+          <img src="${thumbnail}" alt="" loading="lazy">
+          <div class="watching-overlay">
+            <i class="fas fa-play"></i>
+            <span>Watching</span>
+          </div>
+        </div>
+        <div class="episode-title">${displayTitle}</div>
+      `;
+      episodesGrid.appendChild(card);
+    });
+  } catch (err) {
+    console.error("API Error:", err);
+    episodesGrid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
+      <i class="fas fa-triangle-exclamation"></i>
+      <h3>Playlist Unavailable</h3>
+      <p>This playlist may be private, restricted, or has an invalid ID.</p>
+    </div>`;
+  }
+}
+
+function updateActiveEpisodeUI(activeIndex) {
+  const cards = document.querySelectorAll('.episode-card');
+  cards.forEach((c, idx) => {
+    if (idx === activeIndex) {
+      c.classList.add('active');
+    } else {
+      c.classList.remove('active');
+    }
+  });
+}
+
+function showPlaylistGrid() {
+  playerSection.classList.remove('active');
+  playlistSection.style.display = 'block';
+  mainHeader.classList.remove('hidden');
+
+  backBtn.classList.remove('show');
+  floatingAllDramas.classList.remove('show');
+  pageTitle.textContent = 'ARY Serials';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  player?.pauseVideo?.();
+}
+
+window.addEventListener('popstate', (e) => {
+  if (playerSection.classList.contains('active')) {
+    showPlaylistGrid();
+    history.replaceState({ page: 'home' }, '', window.location.pathname);
+  }
+});
+
+const tag = document.createElement('script');
+tag.src = 'https://www.youtube.com/iframe_api';
+document.head.appendChild(tag);
+
+function onYouTubeIframeAPIReady() {
+  const c = document.createElement('div');
+  c.id = 'youtube-player';
+  Object.assign(c.style, {
+    position: 'absolute', top: 0, left: 0, width: '100%', height: '100%'
+  });
+  ytWrapper.insertBefore(c, ytWrapper.firstChild);
+
+  player = new YT.Player('youtube-player', {
+    videoId: 'aknFfkxW7Sk',
+    playerVars: {
+      autoplay: 0, controls: 0, modestbranding: 1, rel: 0,
+      showinfo: 0, iv_load_policy: 3, disablekb: 1, fs: 0,
+      playsinline: 1, origin: window.location.origin
+    },
+    events: { onReady: onPlayerReady, onStateChange: onPlayerStateChange, onError: onPlayerError }
+  });
+}
+
+function onPlayerReady() {
+  isPlayerReady = true;
+  player.setVolume(80);
+  volumeSlider.value = 80;
+
+  setTimeout(() => {
+    const iframe = document.querySelector('#youtube-player iframe');
+    if (iframe) {
+      Object.assign(iframe.style, {
+        position: 'absolute', top: 0, left: 0, width: '100%', height: '100%'
+      });
+    }
+    populateQualities();
+    totalTimeEl.textContent = '0:00';
+    totalTimeEl.classList.remove('show');
+  }, 1000);
+
+  showControls();
+  clearTimeout(hideControlsTimeout);
+
+  // ✅ AD DETECTION START
+  startAdDetection();
+
+  setInterval(() => { if (isPlayerReady && player?.getCurrentTime) updateProgress(); }, 250);
+}
+
+// ✅✅✅ AD DETECTION SYSTEM ✅✅✅
+function startAdDetection() {
+  clearInterval(adCheckInterval);
+  adCheckInterval = setInterval(() => {
+    if (!player || !player.getPlayerState) return;
+
+    // Method 1: YouTube ka official getAdState() (agar available ho)
+    let isAd = false;
+    try {
+      if (typeof player.getAdState === 'function') {
+        const adState = player.getAdState();
+        // getAdState: 0 = no ad, 1 = ad playing, 2 = ad paused, 3 = ad ended
+        isAd = (adState === 1 || adState === 2);
+      }
+    } catch (err) {}
+
+    // Method 2: Fallback - Ad detect karo duration/state se
+    if (!isAd && hasStarted) {
+      try {
+        const state = player.getPlayerState();
+        const cur = player.getCurrentTime();
+        const dur = player.getDuration();
+
+        // YouTube ad ke doran duration achanak chhoti (5-30 sec) ho jati hai
+        // aur current time 0 se start hota hai
+        if (state === YT.PlayerState.PLAYING && dur > 0 && dur < 35 && cur < 2) {
+          // Chhoti video = ad ho sakta hai, lekin ye sirf tab jab hum real video load kar chuke hain
+          if (currentEpisodes.length > 0) {
+            // Ad lagta hai
+            isAd = true;
+          }
+        }
+
+        // Ad end ke baad duration bari ho jati hai
+        if (dur > 60) {
+          isAd = false;
+        }
+      } catch (err) {}
+    }
+
+    if (isAd && !isAdPlaying) {
+      enterAdMode();
+    } else if (!isAd && isAdPlaying) {
+      exitAdMode();
+    }
+  }, 250);
+}
+
+function enterAdMode() {
+  isAdPlaying = true;
+  ytWrapper.classList.add('ad-playing');
+  playerCard.classList.add('ad-playing');
+  // Saare overlays forcefully hide
+  loaderContainer.classList.remove('active');
+  loaderContainer.style.visibility = 'hidden';
+  loaderContainer.style.opacity = '0';
+  ytPauseOverlay.style.display = 'none';
+  centerPlayOverlay.classList.add('hidden');
+  customControls.classList.add('hidden');
+  console.log('▶️ Ad started - overlays hidden');
+}
+
+function exitAdMode() {
+  isAdPlaying = false;
+  ytWrapper.classList.remove('ad-playing');
+  playerCard.classList.remove('ad-playing');
+  loaderContainer.style.visibility = '';
+  loaderContainer.style.opacity = '';
+  console.log('⏹️ Ad ended - overlays restored');
+  // Ad ke baad agar video playing hai to controls dikhao
+  if (player && player.getPlayerState() === YT.PlayerState.PLAYING) {
+    showControlsTemporarily();
+  }
+}
+
+function onPlayerError(e) {
+  console.warn("YouTube Player Error Code:", e.data);
+  loaderContainer.classList.remove('active');
+  exitAdMode(); // Ad mode off karo error pe
+  
+  if (currentEpisodes.length > 0 && currentVideoIndex < currentEpisodes.length - 1) {
+    currentVideoIndex++;
+    updateActiveEpisodeUI(currentVideoIndex);
+    const nextEp = currentEpisodes[currentVideoIndex];
+    if (nextEp && nextEp.snippet && nextEp.snippet.resourceId) {
+      const nextId = nextEp.snippet.resourceId.videoId;
+      const epNum = nextEp.extractedEpNum || (currentVideoIndex + 1);
+      const nextTitle = `Episode ${epNum < 10 ? '0' + epNum : epNum}`;
+      changeVideo(nextId, nextTitle);
+    }
+  }
+}
+
+function onPlayerStateChange(e) {
+  lastPlayerState = e.data;
+
+  // ✅ AD DETECTION: BUFFERING state pe ad mode check
+  if (e.data === YT.PlayerState.BUFFERING && hasStarted && !isAdPlaying) {
+    // Thodi der baad check karo ke ad hai ya normal buffer
+    setTimeout(() => {
+      if (player && player.getPlayerState) {
+        const state = player.getPlayerState();
+        // Agar buffering ke baad bhi playing nahi hua to ad ho sakta hai
+        if (state === YT.PlayerState.PLAYING) {
+          const dur = player.getDuration();
+          // Chhoti duration = ad
+          if (dur > 0 && dur < 35 && currentEpisodes.length > 0) {
+            enterAdMode();
+          }
+        }
+      }
+    }, 800);
+  }
+
+  // ✅ AD END: PLAYING state pe exit ad mode
+  if (e.data === YT.PlayerState.PLAYING) {
+    // Ad mode exit karo agar chal raha hai
+    if (isAdPlaying) {
+      // Thoda wait karo - real video start hone do
+      setTimeout(() => {
+        const dur = player.getDuration();
+        if (dur > 35) {
+          exitAdMode();
+        }
+      }, 500);
+    }
+
+    centerPlayOverlay.classList.add('hidden');
+    if (!isAdPlaying) {
+      loaderContainer.classList.remove('active');
+    }
+    ytPauseOverlay.style.display = 'none'; 
+    
+    isPlaying = true;
+    playPauseIcon.classList.remove('fa-play');
+    playPauseIcon.classList.add('fa-pause');
+
+    if (player?.getDuration) {
+      try {
+        const dur = player.getDuration();
+        if (dur > 0 && !isAdPlaying) {
+          totalTimeEl.textContent = fmt(dur);
+          totalTimeEl.classList.add('show');
+        }
+      } catch (err) {}
+    }
+
+    if (isFullscreen && !isAdPlaying) {
+      clearTimeout(hideControlsTimeout);
+      hideControlsTimeout = setTimeout(hideControls, 5000);
+    } else if (!isAdPlaying) {
+      showControls(); 
+      clearTimeout(hideControlsTimeout);
+    }
+  }
+  
+  if (e.data === YT.PlayerState.PAUSED) {
+    isPlaying = false;
+    playPauseIcon.classList.remove('fa-pause');
+    playPauseIcon.classList.add('fa-play');
+    // Ad ke doran pause ho to black overlay na dikhao
+    if (!isAdPlaying) {
+      ytPauseOverlay.style.display = 'block'; 
+      showControls();
+      clearTimeout(hideControlsTimeout);
+    }
+  }
+
+  if (e.data === YT.PlayerState.ENDED) {
+    isPlaying = false;
+    playPauseIcon.classList.remove('fa-pause');
+    playPauseIcon.classList.add('fa-play');
+    exitAdMode();
+    ytPauseOverlay.style.display = 'block'; 
+    showControls();
+    clearTimeout(hideControlsTimeout);
+  }
+}
+
+function updateProgress() {
+  if (!player?.getCurrentTime) return;
+  
+  // ✅ Ad ke doran progress update mat karo (ad ki duration alag hoti hai)
+  if (isAdPlaying) return;
+  
+  const cur = player.getCurrentTime() || 0;
+  currentTimeEl.textContent = fmt(cur);
+
+  if (player.getPlayerState() === 1 && !totalTimeEl.classList.contains('show')) {
+    totalTimeEl.classList.add('show');
+  }
+
+  const dur = player.getDuration() || 0;
+  if (dur > 0) {
+    progressFilled.style.width = ((cur / dur) * 100) + '%';
+    const buf = player.getVideoLoadedFraction?.() || 0;
+    progressBuffered.style.width = (buf * 100) + '%';
+  }
+}
+
+function fmt(s) {
+  if (isNaN(s) || s < 0) return '0:00';
+  const m = Math.floor(s / 60), sec = Math.floor(s % 60);
+  return `${m}:${sec < 10 ? '0' : ''}${sec}`;
+}
+
+function showControls() {
+  customControls.classList.remove('hidden');
+  controlsVisible = true;
+  clearTimeout(hideControlsTimeout);
+}
+function hideControls() {
+  customControls.classList.add('hidden');
+  controlsVisible = false;
+  qualityMenu.classList.remove('active');
+}
+function resetHideControlsTimer() {
+  clearTimeout(hideControlsTimeout);
+  if (controlsVisible && isFullscreen) {
+    hideControlsTimeout = setTimeout(hideControls, 5000);
+  }
+}
+function showControlsTemporarily() {
+  showControls();
+  resetHideControlsTimer();
+}
+
+bigPlayBtn.addEventListener('click', e => {
+  e.stopPropagation();
+  if (!player?.playVideo) return;
+  hasStarted = true;
+  centerPlayOverlay.classList.add('hidden');
+  // ✅ Loader abhi na dikhao — pehle ad aa sakta hai
+  // loaderContainer.classList.add('active'); // ❌ REMOVED
+  player.unMute();
+  player.playVideo();
+  // Ad detection already chal raha hai — agar ad aaya to enterAdMode khud handle karega
+  // Agar ad nahi aaya to PLAYING state pe loader khud hide ho jayega
+});
+
+clickCapture.addEventListener('click', e => {
+  e.stopPropagation();
+  if (!hasStarted) return;
+  // ✅ Ad ke doran click-capture kaam na kare (YouTube skip button clickable rahe)
+  if (isAdPlaying) return;
+  if (controlsVisible) { 
+    hideControls(); 
+    clearTimeout(hideControlsTimeout); 
+  } else { 
+    showControls(); 
+    resetHideControlsTimer(); 
+  }
+});
+
+playPauseBtn.addEventListener('click', e => {
+  e.stopPropagation();
+  if (!player) return;
+  // Ad ke doran custom play/pause kaam na kare
+  if (isAdPlaying) return;
+  isPlaying ? player.pauseVideo() : player.playVideo();
+  showControlsTemporarily();
+});
+
+$('rewind10').addEventListener('click', e => {
+  e.stopPropagation();
+  if (isAdPlaying) return;
+  if (player?.getCurrentTime) {
+    player.seekTo(Math.max(0, player.getCurrentTime() - 10), true);
+    showControlsTemporarily();
+  }
+});
+$('forward10').addEventListener('click', e => {
+  e.stopPropagation();
+  if (isAdPlaying) return;
+  if (player?.getDuration) {
+    player.seekTo(Math.min(player.getDuration(), player.getCurrentTime() + 10), true);
+    showControlsTemporarily();
+  }
+});
+
+progressBar.addEventListener('click', e => {
+  e.stopPropagation();
+  if (isAdPlaying) return;
+  if (!player?.getDuration) return;
+  const r = progressBar.getBoundingClientRect();
+  const p = (e.clientX - r.left) / r.width;
+  player.seekTo(p * player.getDuration(), true);
+  showControlsTemporarily();
+});
+
+muteBtn.addEventListener('click', e => {
+  e.stopPropagation();
+  if (!player) return;
+  if (player.isMuted()) {
+    player.unMute();
+    player.setVolume(lastVolume);
+    volumeSlider.value = lastVolume;
+    volumeIcon.className = 'fas fa-volume-high';
+  } else {
+    lastVolume = player.getVolume();
+    player.mute();
+    volumeSlider.value = 0;
+    volumeIcon.className = 'fas fa-volume-xmark';
+  }
+});
+volumeSlider.addEventListener('input', e => {
+  e.stopPropagation();
+  if (!player) return;
+  const v = parseInt(e.target.value);
+  player.setVolume(v);
+  player.unMute();
+  lastVolume = v;
+  if (v === 0) volumeIcon.className = 'fas fa-volume-xmark';
+  else if (v < 50) volumeIcon.className = 'fas fa-volume-low';
+  else volumeIcon.className = 'fas fa-volume-high';
+});
+
+qualityToggleBtn.addEventListener('click', e => {
+  e.stopPropagation();
+  if (isAdPlaying) return;
+  qualityMenu.classList.toggle('active');
+  showControlsTemporarily();
+});
+document.addEventListener('click', e => {
+  if (!qualityToggleBtn.contains(e.target) && !qualityMenu.contains(e.target)) {
+    qualityMenu.classList.remove('active');
+  }
+});
+qualityMenu.addEventListener('click', e => {
+  if (!e.target.classList.contains('quality-option')) return;
+  const q = e.target.dataset.quality;
+  currentQualityLabel.textContent = e.target.textContent;
+  document.querySelectorAll('.quality-option').forEach(o => o.classList.remove('active'));
+  e.target.classList.add('active');
+  player?.setPlaybackQuality?.(q);
+  qualityMenu.classList.remove('active');
+  showControlsTemporarily();
+});
+
+function populateQualities() {
+  if (!player?.getAvailableQualityLevels) return;
+  const levels = player.getAvailableQualityLevels();
+  const map = {
+    highres: '4K+', hd1080: '1080p', hd720: '720p',
+    large: '480p', medium: '360p', small: '240p', tiny: '144p'
+  };
+  qualityMenu.innerHTML = '<div class="quality-option active" data-quality="default">Auto</div>';
+  ['highres', 'hd1080', 'hd720', 'large', 'medium', 'small', 'tiny'].forEach(l => {
+    if (levels.includes(l)) {
+      const o = document.createElement('div');
+      o.className = 'quality-option';
+      o.dataset.quality = l;
+      o.textContent = map[l] || l;
+      qualityMenu.appendChild(o);
+    }
+  });
+}
+
+fullscreenBtn.addEventListener('click', async e => {
+  e.stopPropagation();
+  try {
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+      if (playerCard.requestFullscreen) await playerCard.requestFullscreen();
+      else if (playerCard.webkitRequestFullscreen) await playerCard.webkitRequestFullscreen();
+      fullscreenIcon.classList.remove('fa-expand');
+      fullscreenIcon.classList.add('fa-compress');
+      isFullscreen = true;
+      showControls();
+      resetHideControlsTimer();
+    } else {
+      if (document.exitFullscreen) await document.exitFullscreen();
+      else if (document.webkitExitFullscreen) await document.webkitExitFullscreen();
+      fullscreenIcon.classList.remove('fa-compress');
+      fullscreenIcon.classList.add('fa-expand');
+      isFullscreen = false;
+      showControls();
+      clearTimeout(hideControlsTimeout);
+    }
+  } catch (err) { console.log(err); }
+});
+
+const handleFullscreenChange = () => {
+  if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+    fullscreenIcon.classList.remove('fa-compress');
+    fullscreenIcon.classList.add('fa-expand');
+    isFullscreen = false;
+    showControls();
+    clearTimeout(hideControlsTimeout);
+  }
+};
+document.addEventListener('fullscreenchange', handleFullscreenChange);
+document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+
+function changeVideo(videoId, title, thumbnailUrl) {
+  if (!player?.loadVideoById) return;
+  hasStarted = true;
+  // ✅ Reset ad mode naye video pe
+  exitAdMode();
+  centerPlayOverlay.classList.add('hidden');
+  // Loader na dikhao — ad aa sakta hai
+  posterImage.src = thumbnailUrl || `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+  totalTimeEl.textContent = '0:00';
+  totalTimeEl.classList.remove('show');
+  player.unMute();
+  player.loadVideoById(videoId);
+  player.playVideo();
+  progressFilled.style.width = '0%';
+  currentTimeEl.textContent = '0:00';
+  setTimeout(populateQualities, 1500);
+}
+
+searchInput.addEventListener('input', e => {
+  renderPlaylistGrid(e.target.value, true);
+});
+backBtn.addEventListener('click', showPlaylistGrid);
+floatingAllDramas.addEventListener('click', showPlaylistGrid);
+ytWrapper.addEventListener('contextmenu', e => e.preventDefault());
+
+customControls.addEventListener('mouseenter', () => clearTimeout(hideControlsTimeout));
+customControls.addEventListener('mouseleave', () => { if (controlsVisible && isFullscreen) resetHideControlsTimer(); });
+customControls.addEventListener('touchstart', () => clearTimeout(hideControlsTimeout), { passive: true });
+customControls.addEventListener('click', e => { e.stopPropagation(); showControlsTemporarily(); });
+
+history.replaceState({ page: 'home' }, '', window.location.pathname);
+
+renderPlaylistGrid();
+</script>
+</body>
+</html>
